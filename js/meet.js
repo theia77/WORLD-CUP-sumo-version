@@ -283,15 +283,17 @@ const MeetSystem = (() => {
     if (!normalized.ok) { alert2(normalized.reason); return; }
     const finalUrl = normalized.url;
 
-    const iframe   = document.getElementById("meet-stream-iframe");
-    const wrap     = document.getElementById("meet-stream-frame-wrap");
-    const inp      = document.getElementById("meet-stream-input");
-    const openLink = document.getElementById("meet-stream-open-link");
-    const statusEl = document.getElementById("meet-stream-status");
+    const iframe     = document.getElementById("meet-stream-iframe");
+    const wrap       = document.getElementById("meet-stream-frame-wrap");
+    const actionsBar = document.getElementById("meet-stream-actions");
+    const inp        = document.getElementById("meet-stream-input");
+    const openLink   = document.getElementById("meet-stream-open-link");
+    const statusEl   = document.getElementById("meet-stream-status");
 
-    if (inp)      inp.value = finalUrl;
-    if (openLink) { openLink.href = finalUrl; openLink.style.display = "inline-flex"; }
-    if (statusEl) statusEl.textContent = "";
+    if (inp)        inp.value = finalUrl;
+    if (openLink)   openLink.href = finalUrl;
+    if (statusEl)   statusEl.textContent = "";
+    if (actionsBar) actionsBar.style.display = "flex";
 
     // Reset iframe before new src to avoid stale content
     if (iframe) { iframe.src = "about:blank"; setTimeout(() => { iframe.src = finalUrl; }, 50); }
