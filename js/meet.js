@@ -46,6 +46,8 @@ const MeetSystem = (() => {
   let sbCh = null;
   let localStream = null;
   let peers = {};
+  let _lastSyncedUrl = "";
+  let _syncDebounceT = null;
 
   // ── Init ───────────────────────────────────────────────
   function init() {
@@ -131,7 +133,13 @@ const MeetSystem = (() => {
       .on("presence", { event: "sync" }, () => renderPresence(sbCh.presenceState()))
       .on("broadcast", { event: "chat"        }, ({ payload }) => appendMsg(payload))
       .on("broadcast", { event: "emoji_pop"   }, ({ payload }) => rain(payload.e))
-      .on("broadcast", { event: "stream_sync" }, ({ payload }) => loadStream(payload.url, false))
+      .on("broadcast", { event: "stream_sync" }, ({ payload }) => {
+        if (!payload?.url) return;
+        if (payload.url === _lastSyncedUrl) return;
+        _lastSyncedUrl = payload.url;
+        clearTimeout(_syncDebounceT);
+        _syncDebounceT = setTimeout(() => loadStream(payload.url, false), 300);
+      })
       .on("broadcast", { event: "rtc_hello"   }, ({ payload }) => { if (payload.p !== st.peerId) sendOffer(payload.p); })
       .on("broadcast", { event: "rtc_offer"   }, ({ payload }) => { if (payload.to === st.peerId) handleOffer(payload); })
       .on("broadcast", { event: "rtc_answer"  }, ({ payload }) => { if (payload.to === st.peerId) handleAnswer(payload); })
@@ -240,23 +248,92 @@ const MeetSystem = (() => {
     }
   }
 
+  // ── Stream URL normalization ───────────────────────────
+  function toYouTubeEmbed(url) {
+    let m = url.match(/(?:youtube\.com\/watch\?.*v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    if (m) return `https://www.youtube.com/embed/${m[1]}?autoplay=1`;
+    m = url.match(/youtube\.com\/live\/([A-Za-z0-9_-]{11})/);
+    if (m) return `https://www.youtube.com/embed/${m[1]}?autoplay=1`;
+    if (/youtube\.com\/embed\//.test(url)) return url;
+    return null;
+  }
+
+  function isLikelyEmbeddable(url) {
+    const blocked = [
+      "foxsports.com","beinsports.com","tsn.ca","bbc.co.uk","peacocktv.com",
+      "dazn.com","sonyliv.com","hotstar.com","zee5.com","fancode.com",
+      "epicsports.online","fifa.com/fifaplus",
+    ];
+    return !blocked.some(d => url.includes(d));
+  }
+
+  function normalizeStreamUrl(raw) {
+    const url = (raw || "").trim();
+    if (!url) return { ok: false, reason: "Please enter a stream URL." };
+    try { new URL(url); } catch { return { ok: false, reason: "That doesn't look like a valid URL." }; }
+    const ytEmbed = toYouTubeEmbed(url);
+    if (ytEmbed) return { ok: true, url: ytEmbed, embeddable: true };
+    return { ok: true, url, embeddable: isLikelyEmbeddable(url) };
+  }
+
   // ── Stream Sync ────────────────────────────────────────
   async function loadStream(url, broadcast = true) {
-    const iframe = document.getElementById("meet-stream-iframe");
-    const wrap   = document.getElementById("meet-stream-frame-wrap");
-    const inp    = document.getElementById("meet-stream-input");
-    if (inp)   inp.value = url;
-    if (iframe) iframe.src = url;
+    const normalized = normalizeStreamUrl(url);
+    if (!normalized.ok) { alert2(normalized.reason); return; }
+    const finalUrl = normalized.url;
+
+    const iframe   = document.getElementById("meet-stream-iframe");
+    const wrap     = document.getElementById("meet-stream-frame-wrap");
+    const inp      = document.getElementById("meet-stream-input");
+    const openLink = document.getElementById("meet-stream-open-link");
+    const statusEl = document.getElementById("meet-stream-status");
+
+    if (inp)      inp.value = finalUrl;
+    if (openLink) { openLink.href = finalUrl; openLink.style.display = "inline-flex"; }
+    if (statusEl) statusEl.textContent = "";
+
+    // Reset iframe before new src to avoid stale content
+    if (iframe) { iframe.src = "about:blank"; setTimeout(() => { iframe.src = finalUrl; }, 50); }
     wrap?.classList.remove("hidden");
+
+    console.log("[MeetStream] Loading:", finalUrl, "embeddable:", normalized.embeddable);
+
+    // Iframe load / error / timeout handling
+    if (iframe) {
+      let warned = false;
+      const showEmbedWarning = () => {
+        if (warned) return;
+        warned = true;
+        const msg = "This stream provider blocks in-app playback — use 'Open Stream' to watch in a new tab.";
+        if (statusEl) statusEl.textContent = msg;
+        sysMsg("Stream blocked by provider — click Open Stream below the player.");
+        console.log("[MeetStream] embed blocked or timed out for:", finalUrl);
+      };
+      const onLoad = () => {
+        console.log("[MeetStream] iframe load event fired");
+        clearTimeout(loadTimer);
+      };
+      iframe.removeEventListener("load", onLoad);
+      iframe.removeEventListener("error", showEmbedWarning);
+      iframe.addEventListener("load", onLoad, { once: true });
+      iframe.addEventListener("error", showEmbedWarning, { once: true });
+      const loadTimer = setTimeout(showEmbedWarning, 8000);
+      if (!normalized.embeddable) setTimeout(showEmbedWarning, 400);
+    }
+
+    _lastSyncedUrl = finalUrl;
+
     if (broadcast) {
-      sbCh?.send({ type:"broadcast", event:"stream_sync", payload:{ url } });
-      // Persist so late-joiners can fetch it
+      sbCh?.send({ type:"broadcast", event:"stream_sync", payload:{ url: finalUrl } });
       try {
-        await _sb.from("rooms").upsert({ id: st.roomId, stream_url: url, updated_at: new Date().toISOString() }, { onConflict: "id" });
+        await _sb.from("rooms").upsert(
+          { id: st.roomId, stream_url: finalUrl, updated_at: new Date().toISOString() },
+          { onConflict: "id" }
+        );
       } catch(e) { /* non-fatal */ }
       sysMsg(`${st.teamFlag} ${st.nickname} synced a stream for everyone`);
     } else {
-      sysMsg("Host synced a stream — loading for you…");
+      sysMsg("Stream synced — if it doesn't load, click Open Stream below the player.");
     }
   }
 
@@ -463,7 +540,7 @@ const MeetSystem = (() => {
     const code = document.getElementById("meet-room-code-display");
     if (code) code.textContent = roomId;
     const shareInp = document.getElementById("meet-share-url");
-    if (shareInp) shareInp.value = location.href.split("#")[0] + `#meet?room=${roomId}`;
+    if (shareInp) shareInp.value = location.origin + location.pathname + `?room=${roomId}`;
   }
 
   function bindRoom() {
@@ -535,11 +612,14 @@ const MeetSystem = (() => {
 
   // ── Helpers ────────────────────────────────────────────
   function checkUrlRoom() {
-    const m = location.hash.match(/room=([A-Z0-9-]+)/i);
-    if (!m) return;
+    // Support both ?room=CODE (new) and #meet?room=CODE (legacy)
+    const qCode = new URLSearchParams(location.search).get("room");
+    const hMatch = location.hash.match(/room=([A-Z0-9-]+)/i);
+    const code = (qCode || (hMatch && hMatch[1]) || "").toUpperCase();
+    if (!code) return;
     const inp = document.getElementById("meet-room-code-input");
-    if (inp) inp.value = m[1].toUpperCase();
-    document.getElementById("meet")?.scrollIntoView({ behavior:"smooth" });
+    if (inp) inp.value = code;
+    document.getElementById("meet-landing")?.scrollIntoView({ behavior:"smooth" });
   }
 
   function genId() {
