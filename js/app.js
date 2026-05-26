@@ -4,7 +4,8 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
-  initStreamBar();
+  populateTeamSelector();
+  WatchParty.init();
   renderHero();
   renderTeams();
   renderMatches();
@@ -14,7 +15,33 @@ document.addEventListener("DOMContentLoaded", () => {
   API.startNewsAutoRefresh(renderNews);
   initSearch();
   initScrollAnimations();
+  initStatsViewToggle();
 });
+
+// ---- Watch Party team selector ----
+function populateTeamSelector() {
+  const sel = document.getElementById("wp-team-select");
+  if (!sel) return;
+  sel.innerHTML = '<option value="⚽">⚽ Neutral</option>' +
+    TEAMS.map(t => `<option value="${t.flag}">${t.flag} ${t.name}</option>`).join("");
+}
+
+// ---- Stats view toggle ----
+let statsView = "cards";
+function initStatsViewToggle() {
+  document.getElementById("view-cards-btn")?.addEventListener("click", () => {
+    statsView = "cards";
+    document.getElementById("view-cards-btn").classList.add("active");
+    document.getElementById("view-table-btn").classList.remove("active");
+    renderStats();
+  });
+  document.getElementById("view-table-btn")?.addEventListener("click", () => {
+    statsView = "table";
+    document.getElementById("view-table-btn").classList.add("active");
+    document.getElementById("view-cards-btn").classList.remove("active");
+    renderStats();
+  });
+}
 
 // ---- Nav ----
 function initNav() {
@@ -28,42 +55,12 @@ function initNav() {
   });
 }
 
-// ---- Stream Bar ----
-function initStreamBar() {
+// Stream bar is handled by watchparty.js — restore saved URL on load
+(function restoreSavedStreamUrl() {
+  const saved = localStorage.getItem(typeof STREAM_KEY !== 'undefined' ? STREAM_KEY : "wc2026_stream_url");
   const input = document.getElementById("stream-url-input");
-  const btn   = document.getElementById("stream-go-btn");
-  const saved = localStorage.getItem(STREAM_KEY);
   if (saved && input) input.value = saved;
-
-  btn?.addEventListener("click", () => {
-    const url = input?.value?.trim();
-    if (!url) { showStreamAlert("Paste a stream link above first!"); return; }
-    localStorage.setItem(STREAM_KEY, url);
-    window.open(url, "_blank", "noopener");
-  });
-
-  input?.addEventListener("keydown", e => { if (e.key === "Enter") btn?.click(); });
-
-  // Preset broadcaster buttons
-  document.querySelectorAll(".preset-stream").forEach(el => {
-    el.addEventListener("click", () => {
-      const url = el.dataset.url;
-      if (url && input) {
-        input.value = url;
-        localStorage.setItem(STREAM_KEY, url);
-        window.open(url, "_blank", "noopener");
-      }
-    });
-  });
-}
-
-function showStreamAlert(msg) {
-  const el = document.getElementById("stream-alert");
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.add("visible");
-  setTimeout(() => el.classList.remove("visible"), 3000);
-}
+})()
 
 // ---- Hero countdown ----
 function renderHero() {
@@ -323,7 +320,7 @@ function renderStats() {
   const container = document.getElementById("stats-container");
   if (!container) return;
 
-  // Awards banner
+  // Awards banner (always shown)
   let html = `<div class="awards-banner"><h3>🏆 2025-26 Season Honours</h3><div class="awards-scroll">
     ${AWARDS.map(a => `<div class="award-chip">
       <span class="award-nation">${a.nation}</span>
@@ -332,32 +329,82 @@ function renderStats() {
     </div>`).join("")}
   </div></div>`;
 
-  // Group players by league tier
   const tier1 = PLAYERS.filter(p => (LEAGUE_META[p.league]||{}).tier === 1);
   const tier2 = PLAYERS.filter(p => (LEAGUE_META[p.league]||{}).tier !== 1);
 
-  // Group tier1 by league
-  const byLeague = {};
-  tier1.forEach(p => { (byLeague[p.league] = byLeague[p.league]||[]).push(p); });
+  if (statsView === "cards") {
+    // EA FC-style card grid — all players sorted by effective score
+    const allSorted = [...PLAYERS]
+      .filter(p => p.teamId)
+      .sort((a,b) => {
+        const wa = (LEAGUE_META[a.league]||{weight:0.45}).weight;
+        const wb = (LEAGUE_META[b.league]||{weight:0.45}).weight;
+        return (b.rating*wb) - (a.rating*wa);
+      });
 
-  Object.entries(byLeague).forEach(([league, players]) => {
-    const lm = LEAGUE_META[league] || {};
-    html += `<div class="league-section">
-      <h3 class="league-title">${lm.nation} ${lm.name} <span class="weight-tag">Weight: ${lm.weight} (Full)</span></h3>
-      ${playerTable(players)}
+    html += `<div class="cards-league-section">
+      <h3 class="league-title">⭐ Top Performers — EA FC Style <span class="weight-tag">Effective score = Rating × League Weight</span></h3>
+      <div class="ea-cards-grid">${allSorted.map(renderEaCard).join("")}</div>
     </div>`;
-  });
 
-  // Non-top-5 section
-  if (tier2.length) {
-    html += `<div class="league-section">
-      <h3 class="league-title">🌍 Other Leagues <span class="weight-tag weight-discounted">Discounted Weight (0.45–0.65)</span></h3>
-      <p class="league-note">These players still count toward squad analysis but at a reduced weighting vs. top-5 league stars.</p>
-      ${playerTable(tier2)}
-    </div>`;
+  } else {
+    // Table view grouped by league
+    const byLeague = {};
+    tier1.forEach(p => { (byLeague[p.league]=byLeague[p.league]||[]).push(p); });
+
+    Object.entries(byLeague).forEach(([league, players]) => {
+      const lm = LEAGUE_META[league] || {};
+      html += `<div class="league-section">
+        <h3 class="league-title">${lm.nation} ${lm.name} <span class="weight-tag">Weight: ${lm.weight}</span></h3>
+        ${playerTable(players)}
+      </div>`;
+    });
+
+    if (tier2.length) {
+      html += `<div class="league-section">
+        <h3 class="league-title">🌍 Other Leagues <span class="weight-tag weight-discounted">Discounted (0.45–0.65×)</span></h3>
+        <p class="league-note">Still counted — just at reduced weight vs. top-6 league players.</p>
+        ${playerTable(tier2)}
+      </div>`;
+    }
   }
 
   container.innerHTML = html;
+}
+
+function renderEaCard(p) {
+  const lm      = LEAGUE_META[p.league] || LEAGUE_META["Other"];
+  const ovr     = Math.round(p.rating * 10);
+  const eff     = (p.rating * lm.weight).toFixed(1);
+  const wct     = p.teamId ? TEAMS.find(t => t.id === p.teamId) : null;
+  const tier    = ovr >= 90 ? "gold" : ovr >= 85 ? "silver" : "bronze";
+  const posIcon = p.pos === "GK" ? "🧤" : p.pos === "DF" ? "🛡️" : p.pos === "MF" ? "⚙️" : "⚽";
+
+  const stat1lbl = p.pos === "GK" ? "CS"  : p.pos === "DF" ? "GA"  : "GOL";
+  const stat1val = p.pos === "GK" ? p.cs  : p.pos === "DF" ? p.ga  : p.goals;
+  const stat2lbl = p.pos === "GK" ? "RTG" : "AST";
+  const stat2val = p.pos === "GK" ? p.rating : p.assists;
+
+  return `
+    <div class="ea-card ea-${tier}" title="${p.name} — ${p.club}">
+      <div class="ea-top">
+        <div class="ea-ovr">${ovr}</div>
+        <div class="ea-pos">${p.pos}</div>
+        <div class="ea-nation">${p.nation}</div>
+        ${wct ? `<div class="ea-wcteam">${wct.flag}</div>` : ''}
+      </div>
+      <div class="ea-silhouette">${posIcon}</div>
+      <div class="ea-name">${p.name.toUpperCase().split(" ").pop()}</div>
+      <div class="ea-fullname">${p.name}</div>
+      <div class="ea-club">${lm.nation} ${p.club}</div>
+      <div class="ea-stats">
+        <div class="ea-stat"><span class="ea-sv">${stat1val||"—"}</span><span class="ea-sl">${stat1lbl}</span></div>
+        <div class="ea-stat"><span class="ea-sv">${stat2val||"—"}</span><span class="ea-sl">${stat2lbl}</span></div>
+        <div class="ea-stat"><span class="ea-sv ea-eff">${eff}</span><span class="ea-sl">EFF</span></div>
+      </div>
+      ${p.award ? `<div class="ea-award">🏆</div>` : ''}
+      ${lm.tier > 1 ? `<div class="ea-discount-label">×${lm.weight}</div>` : ''}
+    </div>`;
 }
 
 function playerTable(players) {
