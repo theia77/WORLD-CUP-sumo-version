@@ -607,6 +607,112 @@ function flagImg(teamId, size=32) {
   const code = FLAG_CODES[teamId];
   const team = TEAMS.find(t => t.id === teamId);
   const emoji = team?.flag || '🏳️';
-  if (!code) return `<span class="flag-emoji">${emoji}</span>`;
-  return `<img class="flag-img" src="https://flagcdn.com/w${size}/${code}.png" alt="${teamId}" width="${size}" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='inline'" /><span class="flag-emoji" style="display:none">${emoji}</span>`;
+  if (!code) return `<span class="flag-emoji" style="font-size:${Math.round(size*0.7)}px;line-height:1;vertical-align:middle">${emoji}</span>`;
+  const h = Math.round(size * 0.667);
+  return `<img class="flag-img" src="https://flagcdn.com/w${size}/${code}.png" alt="${team?.name||teamId}" width="${size}" height="${h}" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='inline'" /><span class="flag-emoji" style="display:none;font-size:${Math.round(size*0.7)}px;line-height:1;vertical-align:middle">${emoji}</span>`;
+}
+
+// ---- Player Photo System (Wikipedia REST API + sessionStorage cache) ----
+const PLAYER_WIKI_TITLES = {
+  "Lionel Messi":         "Lionel_Messi",
+  "Cristiano Ronaldo":    "Cristiano_Ronaldo",
+  "Kylian Mbappé":        "Kylian_Mbappé",
+  "Erling Haaland":       "Erling_Haaland",
+  "Jude Bellingham":      "Jude_Bellingham",
+  "Harry Kane":           "Harry_Kane",
+  "Mohamed Salah":        "Mohamed_Salah",
+  "Vinícius Jr.":         "Vinícius_Júnior",
+  "Lamine Yamal":         "Lamine_Yamal",
+  "Florian Wirtz":        "Florian_Wirtz",
+  "Jamal Musiala":        "Jamal_Musiala",
+  "Bukayo Saka":          "Bukayo_Saka",
+  "Pedri":                "Pedri",
+  "Rodri":                "Rodri_(footballer,_born_2001)",
+  "Gavi":                 "Gavi_(footballer)",
+  "Dani Olmo":            "Dani_Olmo",
+  "Ousmane Dembélé":      "Ousmane_Dembélé",
+  "Bradley Barcola":      "Bradley_Barcola",
+  "Michael Olise":        "Michael_Olise",
+  "Lautaro Martínez":     "Lautaro_Martínez",
+  "Julián Álvarez":       "Julián_Álvarez",
+  "Marcus Thuram":        "Marcus_Thuram",
+  "Thibaut Courtois":     "Thibaut_Courtois",
+  "Virgil van Dijk":      "Virgil_van_Dijk",
+  "Luis Díaz":            "Luis_Díaz_(footballer,_born_1997)",
+  "Christian Pulisic":    "Christian_Pulisic",
+  "Rafael Leão":          "Rafael_Leão",
+  "Declan Rice":          "Declan_Rice",
+  "Bernardo Silva":       "Bernardo_Silva",
+  "Bruno Fernandes":      "Bruno_Fernandes_(footballer,_born_1994)",
+  "Manuel Neuer":         "Manuel_Neuer",
+  "Kai Havertz":          "Kai_Havertz",
+  "Leroy Sané":           "Leroy_Sané",
+  "Raphinha":             "Raphinha",
+  "Neymar":               "Neymar",
+  "Sadio Mané":           "Sadio_Mané",
+  "Martin Ødegaard":      "Martin_Ødegaard",
+  "Alejandro Garnacho":   "Alejandro_Garnacho",
+  "Ollie Watkins":        "Ollie_Watkins",
+  "Granit Xhaka":         "Granit_Xhaka",
+  "Achraf Hakimi":        "Achraf_Hakimi",
+  "Ivan Toney":           "Ivan_Toney",
+  "Marcus Rashford":      "Marcus_Rashford",
+  "Kobbie Mainoo":        "Kobbie_Mainoo",
+  "Anthony Gordon":       "Anthony_Gordon_(footballer,_born_2001)",
+  "Eberechi Eze":         "Eberechi_Eze",
+  "Désiré Doué":          "Désiré_Doué",
+  "Rayan Cherki":         "Rayan_Cherki",
+  "Mike Maignan":         "Mike_Maignan",
+  "Bruno Guimarães":      "Bruno_Guimarães",
+  "Gabriel Martinelli":   "Gabriel_Martinelli",
+  "Matheus Cunha":        "Matheus_Cunha",
+  "David Raya":           "David_Raya",
+  "Nico Williams":        "Nico_Williams_(footballer)",
+  "Endrick":              "Endrick",
+  "Marcus Rashford":      "Marcus_Rashford",
+};
+
+const _photoPlaceholder = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%23222'/%3E%3Ccircle cx='30' cy='22' r='10' fill='%23444'/%3E%3Cellipse cx='30' cy='52' rx='18' ry='14' fill='%23444'/%3E%3C/svg%3E";
+
+async function getPlayerPhoto(name) {
+  const key = 'wc26p_' + name.replace(/[^a-zA-Z0-9]/g, '_');
+  try {
+    const c = sessionStorage.getItem(key);
+    if (c !== null) return c || null;
+  } catch(e) {}
+  const title = PLAYER_WIKI_TITLES[name];
+  if (!title) {
+    try { sessionStorage.setItem(key, ''); } catch(e) {}
+    return null;
+  }
+  try {
+    const r = await fetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
+      { headers: { 'Accept': 'application/json' } }
+    );
+    if (!r.ok) throw new Error('no');
+    const d = await r.json();
+    const url = d.thumbnail?.source || '';
+    try { sessionStorage.setItem(key, url); } catch(e) {}
+    return url || null;
+  } catch(e) {
+    try { sessionStorage.setItem(key, ''); } catch(e2) {}
+    return null;
+  }
+}
+
+async function loadPhotosIntoImgs(selector) {
+  const imgs = document.querySelectorAll(selector);
+  imgs.forEach(async img => {
+    const name = img.dataset.player;
+    if (!name) return;
+    const url = await getPlayerPhoto(name);
+    if (url) {
+      img.src = url;
+      img.classList.add('photo-loaded');
+      // Hide any fallback sibling (ea-photo-fallback)
+      const fb = img.nextElementSibling;
+      if (fb && fb.classList.contains('ea-photo-fallback')) fb.style.display = 'none';
+    }
+  });
 }
