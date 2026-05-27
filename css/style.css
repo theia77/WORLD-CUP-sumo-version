@@ -4116,3 +4116,195 @@ button { cursor: pointer; }
 .lineup-pick-item:hover { background: var(--bg-hover); }
 .lineup-pick-item.used { opacity: 0.45; }
 .lineup-pick-remove { color: var(--accent); font-weight: 700; justify-content: center; }
+
+/* ── Pack Opening ── */
+.packs-store {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.pack-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 14px;
+  background: linear-gradient(160deg, rgba(0,0,0,0.4), var(--bg-card));
+  border: 2px solid var(--pack-color, var(--border));
+  border-radius: 12px;
+  color: var(--text);
+  box-shadow: 0 0 24px -8px var(--pack-color, transparent);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.pack-tile:hover { transform: translateY(-4px); box-shadow: 0 0 32px -4px var(--pack-color); }
+.pack-tile-icon { font-size: 2.4rem; }
+.pack-tile-name { font-weight: 800; font-size: 0.95rem; }
+.pack-tile-size { font-size: 0.74rem; color: var(--text-dim); }
+
+.packs-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 460px;
+  padding-top: 30px;
+}
+
+/* Sealed pack */
+.packs-pack-wrap { display: flex; align-items: center; justify-content: center; }
+.packs-pack {
+  position: relative;
+  width: 200px;
+  height: 280px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #111, #000 55%, var(--pack-color, #333));
+  border: 2px solid var(--pack-color, #444);
+  box-shadow: 0 0 50px -10px var(--pack-color, #000), inset 0 0 40px rgba(0,0,0,0.6);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: packIdle 2.4s ease-in-out infinite;
+}
+.packs-pack-shine {
+  position: absolute;
+  top: -60%;
+  left: -40%;
+  width: 60%;
+  height: 220%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: rotate(18deg);
+  animation: packShine 2.8s ease-in-out infinite;
+}
+.packs-pack-label {
+  position: relative;
+  margin-bottom: 22px;
+  font-family: var(--font-label);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  animation: packLabelPulse 1.4s ease-in-out infinite;
+}
+@keyframes packIdle { 0%,100%{ transform: translateY(0) rotate(-1deg);} 50%{ transform: translateY(-8px) rotate(1deg);} }
+@keyframes packShine { 0%{ left:-40%; } 60%,100%{ left:140%; } }
+@keyframes packLabelPulse { 0%,100%{ opacity:0.6;} 50%{ opacity:1;} }
+.packs-pack.opening { animation: packBurst 0.85s cubic-bezier(.5,-0.4,.6,1.3) forwards; }
+@keyframes packBurst {
+  0%   { transform: scale(1) rotate(0); }
+  40%  { transform: scale(1.12) rotate(-3deg); filter: brightness(1.6); }
+  70%  { transform: scale(1.05) rotate(2deg); }
+  100% { transform: scale(0.2); opacity: 0; filter: brightness(3); }
+}
+
+/* Revealed cards */
+.packs-reveal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  perspective: 1200px;
+}
+.pack-card { width: 130px; height: 188px; }
+.pack-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(.2,.8,.3,1.2);
+}
+.pack-card.flipped .pack-card-inner { transform: rotateY(180deg); }
+.pack-card-back, .pack-card-front {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.pack-card-back {
+  background: linear-gradient(145deg, #1a1a1a, #000);
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+.pack-card-front {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 6px;
+  color: #1a1208;
+}
+.pack-card-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 2px 4px;
+}
+.pack-card-ovr { font-family: var(--font-geo); font-weight: 700; font-size: 1.3rem; }
+.pack-card-pos { font-size: 0.7rem; font-weight: 700; opacity: 0.8; }
+.pack-card-nation { margin-left: auto; }
+.pack-card-photo {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.15) center/cover no-repeat;
+  margin: 4px 0;
+  border: 2px solid rgba(0,0,0,0.2);
+}
+.pack-card-name {
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-top: 2px;
+}
+.pack-card-club { font-size: 0.62rem; opacity: 0.75; text-align: center; }
+
+/* Rarity skins */
+.pack-card-bronze   .pack-card-front { background: linear-gradient(160deg, #d9a066, #8a5a2b); }
+.pack-card-silver   .pack-card-front { background: linear-gradient(160deg, #e8e8e8, #a8b0b8); }
+.pack-card-gold     .pack-card-front { background: linear-gradient(160deg, #ffe27a, #d4a52a); }
+.pack-card-goldrare .pack-card-front {
+  background: linear-gradient(160deg, #fff1a8, #e3b71e 60%, #b8860b);
+  box-shadow: inset 0 0 24px rgba(255,255,255,0.5);
+}
+.pack-card-special  .pack-card-front {
+  background: linear-gradient(160deg, #2b2b40, #11111c);
+  color: #ffd700;
+  box-shadow: inset 0 0 30px rgba(255,215,0,0.4);
+  border: 1px solid #ffd700;
+}
+.pack-card.walkout { animation: walkout 0.7s ease-out; }
+.pack-card-goldrare.flipped { box-shadow: 0 0 28px -4px #ffd24a; }
+.pack-card-special.flipped  { box-shadow: 0 0 40px -2px #ffd700; }
+@keyframes walkout {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.22) translateY(-10px); }
+  100% { transform: scale(1); }
+}
+
+.packs-actions { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; justify-content: center; }
+
+/* Confetti */
+.packs-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.confetti-bit {
+  position: absolute;
+  top: 45%;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  animation: confettiFly ease-out forwards;
+}
+@keyframes confettiFly {
+  0%   { transform: translate(0,0) rotate(0); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+}

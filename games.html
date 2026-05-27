@@ -32,6 +32,7 @@
     <button class="game-tab-btn" data-game="shootout">🥅 Penalty Shootout</button>
     <button class="game-tab-btn" data-game="bracket">🏆 Bracket Predictor</button>
     <button class="game-tab-btn" data-game="lineup">📋 Lineup Builder</button>
+    <button class="game-tab-btn" data-game="packs">🎴 Pack Opening</button>
   </div>
 
   <!-- Game 1: Score Predictor -->
@@ -197,6 +198,34 @@
     </div>
   </div>
 
+  <!-- Game 6: Pack Opening -->
+  <div id="game-packs" class="game-panel">
+    <div style="text-align:center;margin-bottom:18px">
+      <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px">🎴 Open a Player Pack</h2>
+      <p style="color:var(--text-dim);font-size:0.88rem">Choose a pack and reveal your pull. Chase the gold rares and special walkouts!</p>
+    </div>
+
+    <!-- Pack selection -->
+    <div id="packs-store" class="packs-store"></div>
+
+    <!-- Opening stage -->
+    <div id="packs-stage" class="packs-stage" style="display:none;">
+      <button id="packs-back-btn" class="lineup-btn" style="position:absolute;left:0;top:0;">← Back</button>
+      <div id="packs-pack-wrap" class="packs-pack-wrap">
+        <div id="packs-pack" class="packs-pack">
+          <div class="packs-pack-shine"></div>
+          <div class="packs-pack-label">TAP TO OPEN</div>
+        </div>
+      </div>
+      <div id="packs-reveal" class="packs-reveal" style="display:none;"></div>
+      <div id="packs-actions" class="packs-actions" style="display:none;">
+        <button id="packs-again-btn" class="lineup-btn lineup-btn-primary">🎴 Open Another</button>
+        <button id="packs-store-btn" class="lineup-btn">🏪 Back to Store</button>
+      </div>
+      <div id="packs-confetti" class="packs-confetti" aria-hidden="true"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Player picker -->
@@ -220,5 +249,6 @@
 <script src="js/games.js"></script>
 <script src="js/bracket.js"></script>
 <script src="js/lineup.js"></script>
+<script src="js/packs.js"></script>
 </body>
 </html>
