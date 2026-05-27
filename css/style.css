@@ -4578,15 +4578,21 @@ button { cursor: pointer; }
   align-items: center;
   justify-content: center;
   padding: 100px 20px 60px;
+  position: relative;
+  z-index: 1;
 }
 .auth-card {
-  background: var(--bg-card);
+  background: #111;   /* solid — never see-through against bg cycler */
   border: 1px solid var(--border);
   border-top: 4px solid var(--accent);
   padding: 48px 40px;
   width: 100%;
   max-width: 440px;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.7);
 }
+:root[data-theme="light"] .auth-card { background: #fff; }
 .auth-header { text-align: center; margin-bottom: 36px; }
 .auth-badge {
   font-size: 3rem;
@@ -4679,10 +4685,13 @@ button { cursor: pointer; }
    Profile Page
    ============================================================ */
 .profile-hero {
-  background: var(--bg-card);
+  background: #111;
   border-bottom: 1px solid var(--border);
   padding: 100px 40px 40px;
+  position: relative;
+  z-index: 1;
 }
+:root[data-theme="light"] .profile-hero { background: #fff; }
 .profile-hero-inner {
   max-width: 900px;
   margin: 0 auto;
@@ -4741,13 +4750,18 @@ button { cursor: pointer; }
   display: flex;
   flex-direction: column;
   gap: 24px;
+  position: relative;
+  z-index: 1;
 }
 .profile-section {
-  background: var(--bg-card);
+  background: #111;
   border: 1px solid var(--border);
   border-top: 3px solid var(--accent);
   padding: 28px;
+  position: relative;
+  z-index: 1;
 }
+:root[data-theme="light"] .profile-section { background: #fff; }
 .profile-danger { border-top-color: #e74c3c; }
 .profile-section-title {
   font-family: var(--font-head);
