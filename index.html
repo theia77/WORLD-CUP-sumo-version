@@ -74,6 +74,17 @@
 </section>
 
 <!-- ======================================================
+     Next Match Spotlight
+     ====================================================== -->
+<section class="section section-fade" id="next-match-section" style="display:none">
+  <div class="section-header">
+    <span class="section-tag">⚡ Kicking Off Next</span>
+    <h2 class="section-title">Next Match</h2>
+  </div>
+  <div id="next-match-card" class="next-match-card"></div>
+</section>
+
+<!-- ======================================================
      Host Cities
      ====================================================== -->
 <section class="section section-fade" id="host-cities">
@@ -236,6 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initHeroCountdown();
   initHeroParticles();
   initFavsPreview();
+  initNextMatch();
   renderNewsSkeleton();
   API.startNewsAutoRefresh(renderNews);
   initScrollAnimations();
@@ -324,6 +336,67 @@ function renderNewsSkeleton() {
         <span class="skeleton-line skeleton-short"></span>
       </div>
     </div>`).join('');
+}
+
+// ---- Next Match Spotlight ----
+let _nextMatchTimer;
+function initNextMatch() {
+  if (typeof MATCHES === "undefined") return;
+  const now = Date.now();
+  const upcoming = MATCHES
+    .map(m => ({ m, ts: new Date(`${m.date}T${m.time}:00Z`).getTime() }))
+    .filter(x => !isNaN(x.ts) && x.ts > now)
+    .sort((a, b) => a.ts - b.ts)[0];
+  if (!upcoming) return;
+
+  const { m, ts } = upcoming;
+  const home = TEAMS.find(t => t.id === m.home);
+  const away = TEAMS.find(t => t.id === m.away);
+  if (!home || !away) return;
+  const prob = Predictions.getProbability(m.home, m.away);
+  const k = formatKickoffLocal(m.date, m.time);
+
+  const section = document.getElementById("next-match-section");
+  const card = document.getElementById("next-match-card");
+  if (!card) return;
+  card.innerHTML = `
+    <div class="nm-stage">${m.stage} · ${m.venue}</div>
+    <div class="nm-teams">
+      <div class="nm-team">${flagImg(home.id, 56)}<span>${home.name}</span></div>
+      <div class="nm-vs">
+        <div class="nm-countdown" id="nm-countdown">--:--:--</div>
+        <div class="nm-kickoff">${k.date} · ${k.time} ${k.tz}</div>
+      </div>
+      <div class="nm-team">${flagImg(away.id, 56)}<span>${away.name}</span></div>
+    </div>
+    <div class="nm-prob">
+      <div class="nm-prob-bar">
+        <span class="nm-prob-seg nm-home" style="width:${prob.home}%" title="${home.name} ${prob.home}%"></span>
+        <span class="nm-prob-seg nm-draw" style="width:${prob.draw}%" title="Draw ${prob.draw}%"></span>
+        <span class="nm-prob-seg nm-away" style="width:${prob.away}%" title="${away.name} ${prob.away}%"></span>
+      </div>
+      <div class="nm-prob-labels">
+        <span>${prob.home}% ${home.name}</span>
+        <span>${prob.draw}% Draw</span>
+        <span>${prob.away}% ${away.name}</span>
+      </div>
+    </div>`;
+  if (section) section.style.display = "";
+
+  const tick = () => {
+    const diff = ts - Date.now();
+    const el = document.getElementById("nm-countdown");
+    if (!el) { clearInterval(_nextMatchTimer); return; }
+    if (diff <= 0) { el.textContent = "KICK OFF! ⚽"; clearInterval(_nextMatchTimer); return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const mn = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = (d > 0 ? `${d}d ` : "") +
+      `${String(h).padStart(2,"0")}:${String(mn).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  };
+  tick();
+  _nextMatchTimer = setInterval(tick, 1000);
 }
 
 function renderNewsTicker(articles) {

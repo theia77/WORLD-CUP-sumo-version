@@ -1093,6 +1093,84 @@ button { cursor: pointer; }
 
 .news-card:hover { border-color: var(--accent); }
 
+/* Scroll progress bar — host-nation tricolour */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  z-index: 200;
+  background: linear-gradient(90deg, var(--accent) 0 33%, var(--canada) 33% 66%, var(--accent2) 66% 100%);
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* Next Match Spotlight */
+.next-match-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--accent);
+  padding: 28px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.nm-stage {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 18px;
+}
+.nm-teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+.nm-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-align: center;
+}
+.nm-vs { text-align: center; }
+.nm-countdown {
+  font-family: var(--font-geo);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+.nm-kickoff { font-size: 0.78rem; color: var(--text-dim); margin-top: 4px; }
+.nm-prob { margin-top: 24px; }
+.nm-prob-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.nm-prob-seg { height: 100%; }
+.nm-home { background: var(--accent); }
+.nm-draw { background: var(--text-dim); }
+.nm-away { background: var(--canada); }
+.nm-prob-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.76rem;
+  color: var(--text-dim);
+}
+@media (max-width: 560px) {
+  .nm-team span { font-size: 0.85rem; }
+  .nm-countdown { font-size: 1.2rem; }
+}
+
 /* Live news ticker */
 .news-ticker {
   display: flex;

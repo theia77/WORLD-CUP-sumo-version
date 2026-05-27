@@ -200,8 +200,27 @@ function startBgCycler() {
   setInterval(tick, 12000);
 }
 
+// Scroll progress bar (host-nation tricolour) — injected on every page
+function initScrollProgress() {
+  let bar = document.getElementById("scroll-progress");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "scroll-progress";
+    document.body.appendChild(bar);
+  }
+  const update = () => {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    bar.style.width = max > 0 ? (h.scrollTop / max) * 100 + "%" : "0";
+  };
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  update();
+}
+
 // Page fade-in on load
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("page-loaded");
   startBgCycler();
+  initScrollProgress();
 });
