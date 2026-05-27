@@ -30,6 +30,7 @@
     <button class="game-tab-btn active" data-game="predictor">⚽ Score Predictor</button>
     <button class="game-tab-btn" data-game="quiz">🧠 WC Quiz</button>
     <button class="game-tab-btn" data-game="shootout">🥅 Penalty Shootout</button>
+    <button class="game-tab-btn" data-game="bracket">🏆 Bracket Predictor</button>
   </div>
 
   <!-- Game 1: Score Predictor -->
@@ -128,13 +129,57 @@
     </div>
   </div>
 
+  <!-- Game 4: Bracket Predictor (auth + saved to Supabase) -->
+  <div id="game-bracket" class="game-panel">
+    <div style="max-width:640px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:24px">
+        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px">🏆 Tournament Bracket Predictor</h2>
+        <p style="color:var(--text-dim);font-size:0.88rem">Sign in, pick your favourite nation and your final-four predictions — saved to your account so you can come back anytime.</p>
+      </div>
+
+      <!-- Signed-out: email magic-link login -->
+      <div id="bracket-auth" class="predictor-game-card" style="text-align:center;">
+        <h3 style="font-weight:800;margin-bottom:6px">🔐 Sign in to save your bracket</h3>
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:18px">We'll email you a magic link — no password needed.</p>
+        <div style="display:flex;gap:8px;max-width:380px;margin:0 auto;flex-wrap:wrap;justify-content:center;">
+          <input id="bracket-email" type="email" placeholder="you@email.com" style="flex:1;min-width:200px;padding:11px 14px;background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;color:var(--text);" />
+          <button id="bracket-login-btn" class="btn-primary" style="padding:11px 22px;">Send link →</button>
+        </div>
+        <p id="bracket-auth-msg" style="font-size:0.82rem;margin-top:14px;min-height:18px;"></p>
+      </div>
+
+      <!-- Signed-in: prediction form -->
+      <div id="bracket-form" class="predictor-game-card" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:0.85rem;color:var(--text-dim);">Signed in as <strong id="bracket-user-email" style="color:var(--text)"></strong></span>
+          <button id="bracket-logout-btn" style="font-size:0.78rem;padding:5px 12px;background:var(--bg-hover);border:1px solid var(--border);color:var(--text);border-radius:6px;">Sign out</button>
+        </div>
+
+        <label class="bracket-label">⭐ Favourite Nation</label>
+        <select id="bracket-favorite" class="bracket-select"></select>
+
+        <label class="bracket-label">🥇 Champion</label>
+        <select id="bracket-champion" class="bracket-select"></select>
+
+        <label class="bracket-label">🥈 Runner-up</label>
+        <select id="bracket-runnerup" class="bracket-select"></select>
+
+        <button id="bracket-save-btn" class="btn-primary" style="width:100%;margin-top:20px;padding:13px;">💾 Save my bracket</button>
+        <p id="bracket-save-msg" style="font-size:0.82rem;margin-top:12px;text-align:center;min-height:18px;"></p>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <footer id="footer"></footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/data.js"></script>
 <script src="js/predictions.js"></script>
 <script src="js/shared.js"></script>
+<script src="js/supabase-client.js"></script>
 <script src="js/games.js"></script>
+<script src="js/bracket.js"></script>
 </body>
 </html>
