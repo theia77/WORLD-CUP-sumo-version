@@ -181,6 +181,7 @@ function _makeBgLayer() {
 function startBgCycler() {
   if (typeof getPlayerPhoto !== "function") return;
   if (window.location.pathname.includes("meet")) return;
+  if (window.location.pathname.includes("auth")) return;
   const layerA = _makeBgLayer();
   const layerB = _makeBgLayer();
   let active = layerA, idle = layerB, idx = 0;
