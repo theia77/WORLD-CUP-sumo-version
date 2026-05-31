@@ -109,7 +109,8 @@
 <!-- ======================================================
      Quick Navigation
      ====================================================== -->
-<section class="section section-fade" id="quick-nav-section">
+<section class="section section-fade has-player-bg" id="quick-nav-section">
+  <div class="player-bg-layer" id="quicknav-player-bg" aria-hidden="true"></div>
   <div class="section-header">
     <span class="section-tag">Explore</span>
     <h2 class="section-title">Quick Access</h2>
@@ -233,9 +234,30 @@ document.addEventListener("DOMContentLoaded", () => {
   initHeroCountdown();
   initHeroParticles();
   initFavsPreview();
+  initPlayerBackground();
   API.startNewsAutoRefresh(renderNews);
   initScrollAnimations();
 });
+
+// ---- Player photo background collage (behind Quick Access) ----
+function initPlayerBackground() {
+  var layer = document.getElementById("quicknav-player-bg");
+  if (!layer || typeof PLAYER_PHOTOS === 'undefined') return;
+  // Portugal-first, then world stars — only names that have real photos
+  var names = [
+    "Cristiano Ronaldo", "Bruno Fernandes", "Rafael Leão", "Bernardo Silva",
+    "Rúben Dias", "João Félix", "Kylian Mbappé", "Erling Haaland",
+    "Jude Bellingham", "Vinicius Junior", "Lamine Yamal", "Lionel Messi",
+    "Harry Kane", "Mohamed Salah", "Jamal Musiala", "Raphinha",
+    "Julián Álvarez", "Pedri", "Robert Lewandowski", "Heung-min Son"
+  ];
+  var html = names.map(function(n) {
+    var url = PLAYER_PHOTOS[n];
+    if (!url) return '';
+    return '<div class="player-bg-face" style="background-image:url(\'' + url + '\')" title="' + n + '"></div>';
+  }).filter(Boolean).join('');
+  layer.innerHTML = html;
+}
 
 // ---- Flip countdown ----
 function initHeroCountdown() {

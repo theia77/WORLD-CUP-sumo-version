@@ -773,6 +773,12 @@ const PLAYER_PHOTOS = {
   "Achraf Hakimi":        "https://commons.wikimedia.org/wiki/Special:FilePath/Achraf_Hakimi_2022.jpg",
   "Luis Díaz":            "https://commons.wikimedia.org/wiki/Special:FilePath/Luis_Díaz_2022.jpg",
   "João Palhinha":        "https://commons.wikimedia.org/wiki/Special:FilePath/João_Palhinha_2022.jpg",
+  "Rayan Cherki":         "https://commons.wikimedia.org/wiki/Special:FilePath/Rayan_Cherki_2023.jpg",
+  "Eberechi Eze":         "https://commons.wikimedia.org/wiki/Special:FilePath/Eberechi_Eze_2023.jpg",
+  "Désiré Doué":          "https://commons.wikimedia.org/wiki/Special:FilePath/Désiré_Doué_2024.jpg",
+  "Kobbie Mainoo":        "https://commons.wikimedia.org/wiki/Special:FilePath/Kobbie_Mainoo_2024.jpg",
+  "Anthony Gordon":       "https://commons.wikimedia.org/wiki/Special:FilePath/Anthony_Gordon_2023.jpg",
+  "Jean-Philippe Mateta": "https://commons.wikimedia.org/wiki/Special:FilePath/Jean-Philippe_Mateta_2023.jpg",
 };
 
 function getPlayerPhoto(name) {

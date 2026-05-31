@@ -4253,6 +4253,37 @@ body.light-mode .theme-toggle:hover { background: rgba(0,0,0,0.12); }
 .ea-silver .ea-photo { border-color: #c8c8c8; }
 .ea-bronze .ea-photo { border-color: #c87941; }
 
+/* ============================================================
+   Player Photo Background (behind a section)
+   ============================================================ */
+.has-player-bg { position: relative; overflow: hidden; }
+.has-player-bg > .section-header,
+.has-player-bg > .quick-nav-grid { position: relative; z-index: 2; }
+
+.player-bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  filter: grayscale(0.2) contrast(1.05);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 85%);
+          mask-image: radial-gradient(ellipse at center, #000 30%, transparent 85%);
+}
+.player-bg-face {
+  background-size: cover;
+  background-position: center top;
+  min-height: 120px;
+  filter: blur(1px);
+}
+@media (max-width: 768px) {
+  .player-bg-layer { opacity: 0.12; }
+}
+
 
 /* ============================================================
    Lineup Builder
