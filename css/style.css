@@ -1,6 +1,9 @@
 /* ============================================================
-   World Cup 2026 — Netflix-Dark Theme
+   World Cup 2026 Hub — FWC 26 Brand Identity
+   Typography: Barlow Condensed (closest public match to FWC 2026)
    ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap');
 
 /* Utility */
 .hidden { display: none !important; }
@@ -10,7 +13,7 @@
   --bg-card:    #141420;
   --bg-hover:   #1e1e30;
   --accent:     #e50914;
-  --accent2:    #ff6b35;
+  --accent2:    #c8a84b;   /* trophy gold */
   --gold:       #ffd700;
   --text:       #e5e5e5;
   --text-dim:   #999;
@@ -20,6 +23,10 @@
   --red:        #e74c3c;
   --radius:     12px;
   --shadow:     0 8px 32px rgba(0,0,0,0.6);
+
+  /* Brand typography */
+  --font-display: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+  --font-body:    'Barlow', 'Segoe UI', system-ui, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,9 +36,16 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--bg-dark);
   color: var(--text);
-  font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  font-family: var(--font-body);
   line-height: 1.6;
   overflow-x: hidden;
+}
+
+/* Apply display font globally to all headings */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -68,15 +82,24 @@ button { cursor: pointer; }
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 1.3rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
-.nav-logo .trophy { font-size: 1.6rem; }
+.nav-logo .trophy { font-size: 1.5rem; }
 
 .nav-logo .logo-wc {
   color: var(--accent);
+}
+
+.nav-logo .logo-26 {
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: -1px;
 }
 
 .nav-links {
@@ -86,8 +109,11 @@ button { cursor: pointer; }
 }
 
 .nav-link {
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   color: var(--text-dim);
   transition: color 0.2s;
 }
@@ -175,16 +201,37 @@ button { cursor: pointer; }
 }
 
 .hero-title {
-  font-size: clamp(2.8rem, 8vw, 6rem);
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 10vw, 7.5rem);
   font-weight: 900;
-  line-height: 1.0;
-  letter-spacing: -2px;
-  margin-bottom: 16px;
+  line-height: 0.92;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
 }
 
 .hero-title .wc-year {
   color: var(--accent);
   display: block;
+  font-size: 0.55em;
+  letter-spacing: 4px;
+}
+
+.hero-title .wc-26 {
+  display: block;
+  font-size: 1.8em;
+  line-height: 0.85;
+  color: var(--accent);
+  -webkit-text-stroke: 2px var(--accent);
+  letter-spacing: -4px;
+}
+
+.hero-title .we-are {
+  display: block;
+  font-size: 0.65em;
+  letter-spacing: 8px;
+  color: var(--text-dim);
+  font-weight: 700;
 }
 
 .hero-subtitle {
@@ -260,10 +307,12 @@ button { cursor: pointer; }
 .hero-stat { text-align: left; }
 
 .hero-stat .stat-num {
-  font-size: 2.4rem;
+  font-family: var(--font-display);
+  font-size: 3rem;
   font-weight: 900;
   color: var(--accent);
   line-height: 1;
+  letter-spacing: 1px;
 }
 
 .hero-stat .stat-lbl {
@@ -340,9 +389,11 @@ button { cursor: pointer; }
 }
 
 .section-title {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
   margin-bottom: 8px;
 }
 
