@@ -44,8 +44,8 @@ function buildNav(activePage) {
 
   container.innerHTML = `
     <div class="nav-logo">
-      <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/86/2026_FIFA_World_Cup_logo.svg/120px-2026_FIFA_World_Cup_logo.svg.png" alt="FIFA World Cup 2026 logo" style="height:40px;width:auto;border-radius:6px" loading="lazy" />
-      <span>FIFA World Cup <span class="logo-wc">2026</span></span>
+      <span class="trophy">🏆</span>
+      <span>WC <span class="logo-26">26</span></span>
     </div>
     <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">☰</button>
     <ul class="nav-links" id="nav-links-list">
@@ -109,7 +109,7 @@ function buildFooter(containerId) {
       ${NAV_PAGES.map(p => `<a href="${p.href}">${p.icon} ${p.label}</a>`).join("")}
       <a href="https://www.fifa.com" target="_blank" rel="noopener">FIFA Official</a>
     </div>
-    <p>⚽ <strong>World Cup 2026 Live Hub</strong> — USA · Canada · Mexico</p>
+    <p>⚽ <strong>WE ARE 26</strong> — World Cup 2026 Fan Hub · USA · Canada · Mexico</p>
     <p class="footer-disclaimer">
       Fan-built. Stats: PlanetFootball, ESPN, Tribuna.com, Sky Sports (May 2026).
       Squads: FIFA.com, ESPN, England FA. Win probabilities are algorithmic estimates for entertainment only.
