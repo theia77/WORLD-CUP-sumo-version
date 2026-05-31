@@ -26,6 +26,7 @@
     <button class="game-tab-btn active" data-game="predictor">⚽ Score Predictor</button>
     <button class="game-tab-btn" data-game="quiz">🧠 WC Quiz</button>
     <button class="game-tab-btn" data-game="shootout">🥅 Penalty Shootout</button>
+    <button class="game-tab-btn" data-game="lineup">🗂️ Lineup Builder</button>
   </div>
 
   <!-- Game 1: Score Predictor -->
@@ -121,6 +122,35 @@
         </div>
       </div>
       <div id="shootout-container"></div>
+    </div>
+  </div>
+
+  <!-- Game 4: Lineup Builder -->
+  <div id="game-lineup" class="game-panel">
+    <div class="lineup-builder-card">
+      <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:6px">🗂️ Lineup Builder</h2>
+      <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:20px">Pick a team, choose a formation, click a player then click a slot to place them.</p>
+      <div class="lb-controls">
+        <select id="lb-team-select" class="lb-select"></select>
+        <select id="lb-formation-select" class="lb-select">
+          <option value="4-3-3">4-3-3</option>
+          <option value="4-4-2">4-4-2</option>
+          <option value="3-5-2">3-5-2</option>
+          <option value="4-2-3-1">4-2-3-1</option>
+        </select>
+        <button id="lb-clear-btn" class="btn-secondary" style="padding:8px 16px;">Clear All</button>
+      </div>
+      <div class="lb-layout">
+        <div class="lb-bench-wrap">
+          <div id="lb-bench-gk"  class="lb-pos-group"><div class="lb-pos-label">GK</div><div class="lb-pos-players"></div></div>
+          <div id="lb-bench-df"  class="lb-pos-group"><div class="lb-pos-label">DF</div><div class="lb-pos-players"></div></div>
+          <div id="lb-bench-mf"  class="lb-pos-group"><div class="lb-pos-label">MF</div><div class="lb-pos-players"></div></div>
+          <div id="lb-bench-fw"  class="lb-pos-group"><div class="lb-pos-label">FW</div><div class="lb-pos-players"></div></div>
+        </div>
+        <div class="lb-pitch-wrap">
+          <div class="lb-pitch" id="lb-pitch"></div>
+        </div>
+      </div>
     </div>
   </div>
 

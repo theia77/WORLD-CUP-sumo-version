@@ -576,3 +576,188 @@ function renderWinner() {
       <button onclick="startShootout()" class="btn-primary" style="margin-top:24px;padding:12px 32px;">Play Again 🔄</button>
     </div>`;
 }
+
+// ============================================================
+// LINEUP BUILDER
+// ============================================================
+
+const LB_FORMATIONS = {
+  "4-3-3": [
+    {label:"GK",  x:50, y:86, posGroup:"GK"},
+    {label:"LB",  x:13, y:68, posGroup:"DF"}, {label:"CB", x:36, y:68, posGroup:"DF"},
+    {label:"CB",  x:64, y:68, posGroup:"DF"}, {label:"RB", x:87, y:68, posGroup:"DF"},
+    {label:"LCM", x:22, y:50, posGroup:"MF"}, {label:"CM", x:50, y:47, posGroup:"MF"}, {label:"RCM", x:78, y:50, posGroup:"MF"},
+    {label:"LW",  x:18, y:26, posGroup:"FW"}, {label:"CF", x:50, y:20, posGroup:"FW"}, {label:"RW",  x:82, y:26, posGroup:"FW"},
+  ],
+  "4-4-2": [
+    {label:"GK",  x:50, y:86, posGroup:"GK"},
+    {label:"LB",  x:13, y:68, posGroup:"DF"}, {label:"CB", x:36, y:68, posGroup:"DF"},
+    {label:"CB",  x:64, y:68, posGroup:"DF"}, {label:"RB", x:87, y:68, posGroup:"DF"},
+    {label:"LM",  x:13, y:50, posGroup:"MF"}, {label:"CM", x:37, y:50, posGroup:"MF"},
+    {label:"CM",  x:63, y:50, posGroup:"MF"}, {label:"RM", x:87, y:50, posGroup:"MF"},
+    {label:"ST",  x:35, y:22, posGroup:"FW"}, {label:"ST", x:65, y:22, posGroup:"FW"},
+  ],
+  "3-5-2": [
+    {label:"GK",  x:50, y:86, posGroup:"GK"},
+    {label:"CB",  x:25, y:68, posGroup:"DF"}, {label:"CB", x:50, y:68, posGroup:"DF"}, {label:"CB", x:75, y:68, posGroup:"DF"},
+    {label:"LWB", x:10, y:52, posGroup:"MF"}, {label:"CM", x:30, y:49, posGroup:"MF"}, {label:"CM", x:50, y:47, posGroup:"MF"},
+    {label:"CM",  x:70, y:49, posGroup:"MF"}, {label:"RWB",x:90, y:52, posGroup:"MF"},
+    {label:"ST",  x:35, y:22, posGroup:"FW"}, {label:"ST", x:65, y:22, posGroup:"FW"},
+  ],
+  "4-2-3-1": [
+    {label:"GK",  x:50, y:86, posGroup:"GK"},
+    {label:"LB",  x:13, y:68, posGroup:"DF"}, {label:"CB", x:36, y:68, posGroup:"DF"},
+    {label:"CB",  x:64, y:68, posGroup:"DF"}, {label:"RB", x:87, y:68, posGroup:"DF"},
+    {label:"CDM", x:36, y:55, posGroup:"MF"}, {label:"CDM",x:64, y:55, posGroup:"MF"},
+    {label:"LW",  x:18, y:38, posGroup:"MF"}, {label:"CAM",x:50, y:36, posGroup:"MF"}, {label:"RW",  x:82, y:38, posGroup:"MF"},
+    {label:"ST",  x:50, y:20, posGroup:"FW"},
+  ],
+};
+
+var lbState = {
+  team: null,
+  formation: "4-3-3",
+  selected: null,        // name of bench player selected
+  placed: {},            // slotIdx -> playerName
+  squadPlayers: [],
+};
+
+function initLineupBuilder() {
+  // Populate team select with announced/preliminary squads only
+  var sel = document.getElementById("lb-team-select");
+  if (!sel) return;
+  var opts = TEAMS.filter(function(t) {
+    var sq = SQUADS[t.id];
+    return sq && sq.players && sq.players.length > 0;
+  });
+  sel.innerHTML = opts.map(function(t) {
+    return '<option value="' + t.id + '">' + t.flag + ' ' + t.name + '</option>';
+  }).join("");
+  lbState.team = opts[0] ? opts[0].id : null;
+
+  sel.addEventListener("change", function() {
+    lbState.team = sel.value;
+    lbState.placed = {};
+    lbState.selected = null;
+    lbRender();
+  });
+
+  var fsel = document.getElementById("lb-formation-select");
+  if (fsel) {
+    fsel.addEventListener("change", function() {
+      lbState.formation = fsel.value;
+      lbState.placed = {};
+      lbState.selected = null;
+      lbRender();
+    });
+  }
+
+  var clrBtn = document.getElementById("lb-clear-btn");
+  if (clrBtn) {
+    clrBtn.addEventListener("click", function() {
+      lbState.placed = {};
+      lbState.selected = null;
+      lbRender();
+    });
+  }
+
+  lbRender();
+}
+
+function lbGetSquadPlayers() {
+  if (!lbState.team) return [];
+  var sq = SQUADS[lbState.team];
+  if (!sq || !sq.players || !sq.players.length) return [];
+  return sq.players;
+}
+
+function lbMakePlayerChip(p, isSelected, isPlaced) {
+  var enc = encodeURIComponent(p.name);
+  var src = (PLAYER_PHOTOS && PLAYER_PHOTOS[p.name])
+    ? PLAYER_PHOTOS[p.name]
+    : 'https://ui-avatars.com/api/?name=' + enc + '&background=1e1e30&color=e5e5e5&size=80&bold=true&format=svg';
+  var fb = 'https://ui-avatars.com/api/?name=' + enc + '&background=1e1e30&color=e5e5e5&size=80&bold=true&format=svg';
+  var cls = 'lb-player-chip' + (isSelected ? ' lb-selected' : '') + (isPlaced ? ' lb-placed' : '');
+  var lastName = p.name.split(' ').pop();
+  return '<div class="' + cls + '" data-player="' + p.name.replace(/"/g,'&quot;') + '">' +
+    '<img class="lb-chip-img" src="' + src + '" onerror="this.src=\'' + fb + '\'" alt="' + p.name + '" />' +
+    '<span class="lb-chip-name">' + lastName + '</span>' +
+  '</div>';
+}
+
+function lbRender() {
+  var players = lbGetSquadPlayers();
+  var placed_names = Object.values(lbState.placed);
+
+  // Render bench by position
+  var posGroups = {GK:[], DF:[], MF:[], FW:[]};
+  players.forEach(function(p) { if (posGroups[p.pos]) posGroups[p.pos].push(p); });
+
+  ['GK','DF','MF','FW'].forEach(function(pos) {
+    var wrap = document.querySelector('#lb-bench-' + pos.toLowerCase() + ' .lb-pos-players');
+    if (!wrap) return;
+    wrap.innerHTML = posGroups[pos].map(function(p) {
+      return lbMakePlayerChip(p, lbState.selected === p.name, placed_names.indexOf(p.name) !== -1);
+    }).join('');
+    wrap.querySelectorAll('.lb-player-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        var name = chip.dataset.player;
+        if (lbState.selected === name) { lbState.selected = null; }
+        else { lbState.selected = name; }
+        lbRender();
+      });
+    });
+  });
+
+  // Render pitch slots
+  var pitch = document.getElementById('lb-pitch');
+  if (!pitch) return;
+  var slots = LB_FORMATIONS[lbState.formation] || LB_FORMATIONS["4-3-3"];
+  pitch.innerHTML = slots.map(function(slot, i) {
+    var playerName = lbState.placed[i];
+    var cls = 'lb-slot' + (playerName ? ' lb-slot-filled' : '') + (lbState.selected ? ' lb-slot-target' : '');
+    var inner = '';
+    if (playerName) {
+      var enc = encodeURIComponent(playerName);
+      var src = (PLAYER_PHOTOS && PLAYER_PHOTOS[playerName])
+        ? PLAYER_PHOTOS[playerName]
+        : 'https://ui-avatars.com/api/?name=' + enc + '&background=1e1e30&color=e5e5e5&size=80&bold=true&format=svg';
+      var fb = 'https://ui-avatars.com/api/?name=' + enc + '&background=1e1e30&color=e5e5e5&size=80&bold=true&format=svg';
+      var ln = playerName.split(' ').pop();
+      inner = '<img class="lb-slot-img" src="' + src + '" onerror="this.src=\'' + fb + '\'" alt="' + playerName + '" />' +
+              '<span class="lb-slot-name">' + ln + '</span>';
+    } else {
+      inner = '<span class="lb-slot-pos">' + slot.label + '</span>';
+    }
+    return '<div class="' + cls + '" data-slot="' + i + '" style="left:' + slot.x + '%;top:' + slot.y + '%">' + inner + '</div>';
+  }).join('');
+
+  pitch.querySelectorAll('.lb-slot').forEach(function(slotEl) {
+    slotEl.addEventListener('click', function() {
+      var i = parseInt(slotEl.dataset.slot);
+      if (lbState.selected) {
+        // Remove player from any other slot
+        Object.keys(lbState.placed).forEach(function(k) {
+          if (lbState.placed[k] === lbState.selected) delete lbState.placed[k];
+        });
+        lbState.placed[i] = lbState.selected;
+        lbState.selected = null;
+        lbRender();
+      } else if (lbState.placed[i]) {
+        // Click placed player to unplace
+        delete lbState.placed[i];
+        lbRender();
+      }
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  // Wire up lineup builder tab activation
+  var lineupTab = document.querySelector('[data-game="lineup"]');
+  if (lineupTab) {
+    lineupTab.addEventListener("click", function() {
+      if (!lbState.team) initLineupBuilder();
+    });
+  }
+});
