@@ -261,6 +261,7 @@ const SQUADS = {
       { name:"Bukayo Saka",       pos:"FW", club:"Arsenal",             league:"EPL"        },
       { name:"Marcus Rashford",   pos:"FW", club:"Barcelona",           league:"LaLiga"     },
       { name:"Anthony Gordon",    pos:"FW", club:"Newcastle",           league:"EPL"        },
+      { name:"Noni Madueke",      pos:"FW", club:"Chelsea",            league:"EPL"        },
     ]
   },
 
@@ -298,6 +299,7 @@ const SQUADS = {
       { name:"Kai Havertz",           pos:"FW", club:"Arsenal",          league:"EPL"        },
       { name:"Denis Undav",           pos:"FW", club:"Stuttgart",        league:"Bundesliga" },
       { name:"Nick Woltemeade",       pos:"FW", club:"Stuttgart",        league:"Bundesliga" },
+      { name:"Thomas Müller",     pos:"FW", club:"Bayern Munich",      league:"Bundesliga" },
     ]
   },
 
@@ -306,6 +308,9 @@ const SQUADS = {
     status: "ANNOUNCED", date: "2026-05-18", squadSize: 26,
     note: "Carlo Ancelotti's Brazil. Neymar controversially recalled, now at Santos. Vini Jr leads attack.",
     players: [
+      // GK
+      { name:"Alisson",           pos:"GK", club:"Liverpool",          league:"EPL"        },
+      { name:"Ederson",           pos:"GK", club:"Man City",           league:"EPL"        },
       // DF
       { name:"Wesley",            pos:"DF", club:"Roma",              league:"SerieA"     },
       { name:"Douglas Santos",    pos:"DF", club:"Flamengo",          league:"Other"      },
@@ -353,12 +358,15 @@ const SQUADS = {
       { name:"Theo Hernandez",        pos:"DF", club:"AC Milan",           league:"SerieA"     },
       { name:"Jonathan Clauss",       pos:"DF", club:"Marseille",          league:"Ligue1"     },
       { name:"Timothée Pembélé",      pos:"DF", club:"Eintracht Frankfurt", league:"Bundesliga" },
+      { name:"Jules Koundé",          pos:"DF", club:"Barcelona",          league:"LaLiga"     },
       // MF
       { name:"Aurélien Tchouaméni",   pos:"MF", club:"Real Madrid",        league:"LaLiga"     },
       { name:"N'Golo Kanté",          pos:"MF", club:"Al-Ittihad",         league:"SaudiPro"   },
       { name:"Rayan Cherki",          pos:"MF", club:"Man City",           league:"EPL"        },
       { name:"Désiré Doué",           pos:"MF", club:"PSG",                league:"Ligue1"     },
       { name:"Maghnes Akliouche",     pos:"MF", club:"Monaco",             league:"Ligue1"     },
+      { name:"Warren Zaïre-Emery",    pos:"MF", club:"PSG",                league:"Ligue1"     },
+      { name:"Adrien Rabiot",         pos:"MF", club:"Marseille",          league:"Ligue1"     },
       // FW
       { name:"Kylian Mbappé",         pos:"FW", club:"Real Madrid",        league:"LaLiga"     },
       { name:"Ousmane Dembélé",       pos:"FW", club:"PSG",                league:"Ligue1"     },
@@ -366,6 +374,8 @@ const SQUADS = {
       { name:"Bradley Barcola",       pos:"FW", club:"PSG",                league:"Ligue1"     },
       { name:"Marcus Thuram",         pos:"FW", club:"Inter Milan",        league:"SerieA"     },
       { name:"Jean-Philippe Mateta",  pos:"FW", club:"Crystal Palace",     league:"EPL"        },
+      { name:"Christopher Nkunku",    pos:"FW", club:"Chelsea",            league:"EPL"        },
+      { name:"Randal Kolo Muani",     pos:"FW", club:"PSG",                league:"Ligue1"     },
     ]
   },
 
@@ -377,6 +387,7 @@ const SQUADS = {
       // GK
       { name:"David Raya",            pos:"GK", club:"Arsenal",            league:"EPL"        },
       { name:"Robert Sánchez",        pos:"GK", club:"Chelsea",            league:"EPL"        },
+      { name:"Unai Simón",            pos:"GK", club:"Athletic Club",      league:"LaLiga"     },
       // DF
       { name:"Dani Carvajal",         pos:"DF", club:"Real Madrid",        league:"LaLiga"     },
       { name:"Nacho",                 pos:"DF", club:"Al-Qadsiah",         league:"SaudiPro"   },
@@ -386,12 +397,15 @@ const SQUADS = {
       { name:"Marc Cucurella",        pos:"DF", club:"Chelsea",            league:"EPL"        },
       { name:"Alejandro Grimaldo",    pos:"DF", club:"Bayer Leverkusen",   league:"Bundesliga" },
       { name:"Víctor Muñoz",          pos:"DF", club:"Osasuna",            league:"LaLiga"     },
+      { name:"Pau Cubarsí",           pos:"DF", club:"Barcelona",          league:"LaLiga"     },
       // MF
       { name:"Rodri",                 pos:"MF", club:"Man City",           league:"EPL"        },
       { name:"Pedri",                 pos:"MF", club:"Barcelona",          league:"LaLiga"     },
       { name:"Gavi",                  pos:"MF", club:"Barcelona",          league:"LaLiga"     },
       { name:"Fabián Ruiz",           pos:"MF", club:"PSG",                league:"Ligue1"     },
       { name:"Dani Olmo",             pos:"MF", club:"Barcelona",          league:"LaLiga"     },
+      { name:"Mikel Merino",          pos:"MF", club:"Arsenal",            league:"EPL"        },
+      { name:"Álex Baena",            pos:"MF", club:"Villarreal",         league:"LaLiga"     },
       // FW
       { name:"Lamine Yamal",          pos:"FW", club:"Barcelona",          league:"LaLiga"     },
       { name:"Nico Williams",         pos:"FW", club:"Athletic Club",      league:"LaLiga"     },
@@ -403,21 +417,41 @@ const SQUADS = {
     ]
   },
 
-  // ── Argentina (PRELIMINARY May 12) ───────────────────────
+  // ── Argentina (ANNOUNCED May 30) ──────────────────────────
   arg: {
-    status: "PRELIMINARY", date: "2026-05-12",
-    note: "Messi (Inter Miami/MLS) included but participation uncertain. Lautaro, Alvarez lead attack.",
+    status: "ANNOUNCED", date: "2026-05-30", squadSize: 26,
+    note: "Messi (Inter Miami) included; 38 years old, his final World Cup. Lautaro and Álvarez the striking duo.",
     players: [
-      { name:"Lionel Messi",          pos:"FW", club:"Inter Miami",        league:"MLS"        },
-      { name:"Lautaro Martínez",      pos:"FW", club:"Inter Milan",        league:"SerieA"     },
-      { name:"Julián Álvarez",        pos:"FW", club:"Atlético Madrid",    league:"LaLiga"     },
-      { name:"Alejandro Garnacho",    pos:"FW", club:"Chelsea",            league:"EPL"        },
-      { name:"Franco Mastantuono",    pos:"MF", club:"Real Madrid",        league:"LaLiga"     },
-      { name:"Thiago Almada",         pos:"MF", club:"Atlético Madrid",    league:"LaLiga"     },
-      { name:"Matías Soulé",          pos:"FW", club:"Roma",               league:"SerieA"     },
-      { name:"Claudio Echeverri",     pos:"MF", club:"Girona",             league:"LaLiga"     },
-      { name:"Nicolás Paz",           pos:"MF", club:"Como",               league:"SerieA"     },
-      { name:"Giuliano Simeone",      pos:"FW", club:"Atlético Madrid",    league:"LaLiga"     },
+      // GK
+      { name:"Emiliano Martínez",   pos:"GK", club:"Aston Villa",       league:"EPL"        },
+      { name:"Franco Armani",       pos:"GK", club:"River Plate",        league:"Other"      },
+      { name:"Gerónimo Rulli",      pos:"GK", club:"Marseille",          league:"Ligue1"     },
+      // DF
+      { name:"Cristian Romero",     pos:"DF", club:"Tottenham",          league:"EPL"        },
+      { name:"Nicolás Otamendi",    pos:"DF", club:"Benfica",            league:"Other"      },
+      { name:"Lisandro Martínez",   pos:"DF", club:"Man United",         league:"EPL"        },
+      { name:"Nicolás Tagliafico",  pos:"DF", club:"Lyon",               league:"Ligue1"     },
+      { name:"Nahuel Molina",       pos:"DF", club:"Atlético Madrid",    league:"LaLiga"     },
+      { name:"Gonzalo Montiel",     pos:"DF", club:"Sevilla",            league:"LaLiga"     },
+      { name:"Marcos Acuña",        pos:"DF", club:"Sevilla",            league:"LaLiga"     },
+      // MF
+      { name:"Rodrigo De Paul",     pos:"MF", club:"Atlético Madrid",    league:"LaLiga"     },
+      { name:"Leandro Paredes",     pos:"MF", club:"Roma",               league:"SerieA"     },
+      { name:"Enzo Fernández",      pos:"MF", club:"Chelsea",            league:"EPL"        },
+      { name:"Giovani Lo Celso",    pos:"MF", club:"Villarreal",         league:"LaLiga"     },
+      { name:"Franco Mastantuono", pos:"MF", club:"Real Madrid",         league:"LaLiga"     },
+      { name:"Thiago Almada",       pos:"MF", club:"Atlético Madrid",    league:"LaLiga"     },
+      { name:"Claudio Echeverri",   pos:"MF", club:"Girona",             league:"LaLiga"     },
+      // FW
+      { name:"Lionel Messi",        pos:"FW", club:"Inter Miami",        league:"MLS"        },
+      { name:"Lautaro Martínez",    pos:"FW", club:"Inter Milan",        league:"SerieA"     },
+      { name:"Julián Álvarez",      pos:"FW", club:"Atlético Madrid",    league:"LaLiga"     },
+      { name:"Alejandro Garnacho",  pos:"FW", club:"Chelsea",            league:"EPL"        },
+      { name:"Matías Soulé",        pos:"FW", club:"Roma",               league:"SerieA"     },
+      { name:"Nicolás González",    pos:"FW", club:"Fiorentina",         league:"SerieA"     },
+      { name:"Paulo Dybala",        pos:"FW", club:"Roma",               league:"SerieA"     },
+      { name:"Giuliano Simeone",    pos:"FW", club:"Atlético Madrid",    league:"LaLiga"     },
+      { name:"Nicolás Paz",         pos:"MF", club:"Como",               league:"SerieA"     },
     ]
   },
 
@@ -429,6 +463,7 @@ const SQUADS = {
       // GK
       { name:"Diogo Costa",       pos:"GK", club:"Porto",             league:"LigaPortugal" },
       { name:"José Sá",           pos:"GK", club:"Wolves",            league:"EPL"          },
+      { name:"Rui Patrício",      pos:"GK", club:"Roma",              league:"SerieA"       },
       // DF
       { name:"Rúben Dias",        pos:"DF", club:"Man City",          league:"EPL"          },
       { name:"Inácio",            pos:"DF", club:"Sporting CP",       league:"LigaPortugal" },
@@ -613,31 +648,97 @@ function flagImg(teamId, size=32) {
 
 // ---- Player photo URLs (Wikipedia Commons) ----
 const PLAYER_PHOTOS = {
-  "Kylian Mbappé":      "https://commons.wikimedia.org/wiki/Special:FilePath/Kylian_Mbappe_2019.jpg",
-  "Lionel Messi":       "https://commons.wikimedia.org/wiki/Special:FilePath/Leo_Messi_v_Nigeria_2018.jpg",
-  "Cristiano Ronaldo":  "https://commons.wikimedia.org/wiki/Special:FilePath/Cristiano_Ronaldo_2018.jpg",
-  "Harry Kane":         "https://commons.wikimedia.org/wiki/Special:FilePath/Harry_Kane_2021_%28cropped%29.jpg",
-  "Erling Haaland":     "https://commons.wikimedia.org/wiki/Special:FilePath/Erling_Haaland_2022.jpg",
-  "Jude Bellingham":    "https://commons.wikimedia.org/wiki/Special:FilePath/Jude_Bellingham_2023.jpg",
-  "Bukayo Saka":        "https://commons.wikimedia.org/wiki/Special:FilePath/Bukayo_Saka_2022.jpg",
-  "Mohamed Salah":      "https://commons.wikimedia.org/wiki/Special:FilePath/Mohamed_Salah_2022.jpg",
-  "Lamine Yamal":       "https://commons.wikimedia.org/wiki/Special:FilePath/Lamine_Yamal_2024.jpg",
-  "Vinicius Junior":    "https://commons.wikimedia.org/wiki/Special:FilePath/Vinicius_Junior_2023.jpg",
-  "Robert Lewandowski": "https://commons.wikimedia.org/wiki/Special:FilePath/Robert_Lewandowski_2022.jpg",
-  "Pedri":              "https://commons.wikimedia.org/wiki/Special:FilePath/Pedri_2022.jpg",
-  "Gavi":               "https://commons.wikimedia.org/wiki/Special:FilePath/Gavi_2022.jpg",
-  "Rodri":              "https://commons.wikimedia.org/wiki/Special:FilePath/Rodri_2022.jpg",
-  "Martin Ødegaard":    "https://commons.wikimedia.org/wiki/Special:FilePath/Martin_%C3%98degaard_2023.jpg",
-  "Virgil van Dijk":    "https://commons.wikimedia.org/wiki/Special:FilePath/Virgil_van_Dijk_2019.jpg",
-  "Bruno Fernandes":    "https://commons.wikimedia.org/wiki/Special:FilePath/Bruno_Fernandes_2021.jpg",
-  "Christian Pulisic":  "https://commons.wikimedia.org/wiki/Special:FilePath/Christian_Pulisic_2023.jpg",
-  "Heung-min Son":      "https://commons.wikimedia.org/wiki/Special:FilePath/Son_Heung-min_2022.jpg",
-  "Antoine Griezmann":  "https://commons.wikimedia.org/wiki/Special:FilePath/Antoine_Griezmann_2022.jpg",
-  "Declan Rice":        "https://commons.wikimedia.org/wiki/Special:FilePath/Declan_Rice_2022.jpg",
-  "Alejandro Garnacho": "https://commons.wikimedia.org/wiki/Special:FilePath/Alejandro_Garnacho_2023.jpg",
-  "Bruno Guimarães":    "https://commons.wikimedia.org/wiki/Special:FilePath/Bruno_Guimaraes_2023.jpg",
-  "Gabriel Martinelli": "https://commons.wikimedia.org/wiki/Special:FilePath/Gabriel_Martinelli_2023.jpg",
-  "Ollie Watkins":      "https://commons.wikimedia.org/wiki/Special:FilePath/Ollie_Watkins_2023.jpg",
+  // England
+  "Kylian Mbappé":        "https://commons.wikimedia.org/wiki/Special:FilePath/Kylian_Mbappe_2019.jpg",
+  "Lionel Messi":         "https://commons.wikimedia.org/wiki/Special:FilePath/Leo_Messi_v_Nigeria_2018.jpg",
+  "Cristiano Ronaldo":    "https://commons.wikimedia.org/wiki/Special:FilePath/Cristiano_Ronaldo_2018.jpg",
+  "Harry Kane":           "https://commons.wikimedia.org/wiki/Special:FilePath/Harry_Kane_2021_%28cropped%29.jpg",
+  "Erling Haaland":       "https://commons.wikimedia.org/wiki/Special:FilePath/Erling_Haaland_2022.jpg",
+  "Jude Bellingham":      "https://commons.wikimedia.org/wiki/Special:FilePath/Jude_Bellingham_2023.jpg",
+  "Bukayo Saka":          "https://commons.wikimedia.org/wiki/Special:FilePath/Bukayo_Saka_2022.jpg",
+  "Mohamed Salah":        "https://commons.wikimedia.org/wiki/Special:FilePath/Mohamed_Salah_2022.jpg",
+  "Lamine Yamal":         "https://commons.wikimedia.org/wiki/Special:FilePath/Lamine_Yamal_2024.jpg",
+  "Vinicius Junior":      "https://commons.wikimedia.org/wiki/Special:FilePath/Vinicius_Junior_2023.jpg",
+  "Vinícius Jr.":         "https://commons.wikimedia.org/wiki/Special:FilePath/Vinicius_Junior_2023.jpg",
+  "Robert Lewandowski":   "https://commons.wikimedia.org/wiki/Special:FilePath/Robert_Lewandowski_2022.jpg",
+  "Pedri":                "https://commons.wikimedia.org/wiki/Special:FilePath/Pedri_2022.jpg",
+  "Gavi":                 "https://commons.wikimedia.org/wiki/Special:FilePath/Gavi_2022.jpg",
+  "Rodri":                "https://commons.wikimedia.org/wiki/Special:FilePath/Rodri_2022.jpg",
+  "Martin Ødegaard":      "https://commons.wikimedia.org/wiki/Special:FilePath/Martin_%C3%98degaard_2023.jpg",
+  "Virgil van Dijk":      "https://commons.wikimedia.org/wiki/Special:FilePath/Virgil_van_Dijk_2019.jpg",
+  "Bruno Fernandes":      "https://commons.wikimedia.org/wiki/Special:FilePath/Bruno_Fernandes_2021.jpg",
+  "Christian Pulisic":    "https://commons.wikimedia.org/wiki/Special:FilePath/Christian_Pulisic_2023.jpg",
+  "Heung-min Son":        "https://commons.wikimedia.org/wiki/Special:FilePath/Son_Heung-min_2022.jpg",
+  "Antoine Griezmann":    "https://commons.wikimedia.org/wiki/Special:FilePath/Antoine_Griezmann_2022.jpg",
+  "Declan Rice":          "https://commons.wikimedia.org/wiki/Special:FilePath/Declan_Rice_2022.jpg",
+  "Alejandro Garnacho":   "https://commons.wikimedia.org/wiki/Special:FilePath/Alejandro_Garnacho_2023.jpg",
+  "Bruno Guimarães":      "https://commons.wikimedia.org/wiki/Special:FilePath/Bruno_Guimaraes_2023.jpg",
+  "Gabriel Martinelli":   "https://commons.wikimedia.org/wiki/Special:FilePath/Gabriel_Martinelli_2023.jpg",
+  "Ollie Watkins":        "https://commons.wikimedia.org/wiki/Special:FilePath/Ollie_Watkins_2023.jpg",
+  // Germany
+  "Jamal Musiala":        "https://commons.wikimedia.org/wiki/Special:FilePath/Jamal_Musiala_2022.jpg",
+  "Florian Wirtz":        "https://commons.wikimedia.org/wiki/Special:FilePath/Florian_Wirtz_2023.jpg",
+  "Kai Havertz":          "https://commons.wikimedia.org/wiki/Special:FilePath/Kai_Havertz_2022.jpg",
+  "Joshua Kimmich":       "https://commons.wikimedia.org/wiki/Special:FilePath/Joshua_Kimmich_2019.jpg",
+  "Manuel Neuer":         "https://commons.wikimedia.org/wiki/Special:FilePath/Manuel_Neuer_2022.jpg",
+  "Leroy Sané":           "https://commons.wikimedia.org/wiki/Special:FilePath/Leroy_Sane_2018.jpg",
+  // Brazil
+  "Raphinha":             "https://commons.wikimedia.org/wiki/Special:FilePath/Raphinha_2022.jpg",
+  "Neymar":               "https://commons.wikimedia.org/wiki/Special:FilePath/Neymar_2022.jpg",
+  "Casemiro":             "https://commons.wikimedia.org/wiki/Special:FilePath/Casemiro_2022.jpg",
+  "Marquinhos":           "https://commons.wikimedia.org/wiki/Special:FilePath/Marquinhos_2022.jpg",
+  "Alisson":              "https://commons.wikimedia.org/wiki/Special:FilePath/Alisson_Becker_2018.jpg",
+  "Ederson":              "https://commons.wikimedia.org/wiki/Special:FilePath/Ederson_%28footballer%29_2018.jpg",
+  "Endrick":              "https://commons.wikimedia.org/wiki/Special:FilePath/Endrick_2023.jpg",
+  // France
+  "Ousmane Dembélé":      "https://commons.wikimedia.org/wiki/Special:FilePath/Ousmane_Dembélé_2022.jpg",
+  "Aurélien Tchouaméni":  "https://commons.wikimedia.org/wiki/Special:FilePath/Aurélien_Tchouaméni_2022.jpg",
+  "N'Golo Kanté":         "https://commons.wikimedia.org/wiki/Special:FilePath/NGolo_Kante_2019.jpg",
+  "William Saliba":       "https://commons.wikimedia.org/wiki/Special:FilePath/William_Saliba_2022.jpg",
+  "Mike Maignan":         "https://commons.wikimedia.org/wiki/Special:FilePath/Mike_Maignan_2022.jpg",
+  "Marcus Thuram":        "https://commons.wikimedia.org/wiki/Special:FilePath/Marcus_Thuram_2022.jpg",
+  "Theo Hernandez":       "https://commons.wikimedia.org/wiki/Special:FilePath/Theo_Hernandez_2022.jpg",
+  "Bradley Barcola":      "https://commons.wikimedia.org/wiki/Special:FilePath/Bradley_Barcola_2023.jpg",
+  "Gianluigi Donnarumma": "https://commons.wikimedia.org/wiki/Special:FilePath/Gianluigi_Donnarumma_2022.jpg",
+  "Michael Olise":        "https://commons.wikimedia.org/wiki/Special:FilePath/Michael_Olise_2023.jpg",
+  // Spain
+  "Nico Williams":        "https://commons.wikimedia.org/wiki/Special:FilePath/Nico_Williams_2024.jpg",
+  "Dani Olmo":            "https://commons.wikimedia.org/wiki/Special:FilePath/Dani_Olmo_2022.jpg",
+  "Álvaro Morata":        "https://commons.wikimedia.org/wiki/Special:FilePath/Álvaro_Morata_2022.jpg",
+  "David Raya":           "https://commons.wikimedia.org/wiki/Special:FilePath/David_Raya_2022.jpg",
+  // Argentina
+  "Lautaro Martínez":     "https://commons.wikimedia.org/wiki/Special:FilePath/Lautaro_Martínez_2022.jpg",
+  "Julián Álvarez":       "https://commons.wikimedia.org/wiki/Special:FilePath/Julián_Álvarez_2022.jpg",
+  "Emiliano Martínez":    "https://commons.wikimedia.org/wiki/Special:FilePath/Emiliano_Martínez_2022.jpg",
+  "Cristian Romero":      "https://commons.wikimedia.org/wiki/Special:FilePath/Cristian_Romero_2022.jpg",
+  "Rodrigo De Paul":      "https://commons.wikimedia.org/wiki/Special:FilePath/Rodrigo_De_Paul_2022.jpg",
+  "Enzo Fernández":       "https://commons.wikimedia.org/wiki/Special:FilePath/Enzo_Fernandez_2022.jpg",
+  "Lisandro Martínez":    "https://commons.wikimedia.org/wiki/Special:FilePath/Lisandro_Martínez_2022.jpg",
+  // Portugal
+  "Rúben Dias":           "https://commons.wikimedia.org/wiki/Special:FilePath/Rúben_Dias_2022.jpg",
+  "João Félix":           "https://commons.wikimedia.org/wiki/Special:FilePath/João_Félix_2022.jpg",
+  "Bernardo Silva":       "https://commons.wikimedia.org/wiki/Special:FilePath/Bernardo_Silva_2022.jpg",
+  "Rafael Leão":          "https://commons.wikimedia.org/wiki/Special:FilePath/Rafael_Leão_2022.jpg",
+  "Diogo Costa":          "https://commons.wikimedia.org/wiki/Special:FilePath/Diogo_Costa_2022.jpg",
+  "João Cancelo":         "https://commons.wikimedia.org/wiki/Special:FilePath/João_Cancelo_2022.jpg",
+  "Vitinha":              "https://commons.wikimedia.org/wiki/Special:FilePath/Vitinha_2022.jpg",
+  "Gonçalo Ramos":        "https://commons.wikimedia.org/wiki/Special:FilePath/Gonçalo_Ramos_2022.jpg",
+  "Diogo Jota":           "https://commons.wikimedia.org/wiki/Special:FilePath/Diogo_Jota_2022.jpg",
+  "Nuno Mendes":          "https://commons.wikimedia.org/wiki/Special:FilePath/Nuno_Mendes_2022.jpg",
+  "Pedro Neto":           "https://commons.wikimedia.org/wiki/Special:FilePath/Pedro_Neto_2022.jpg",
+  // Switzerland
+  "Granit Xhaka":         "https://commons.wikimedia.org/wiki/Special:FilePath/Granit_Xhaka_2022.jpg",
+  "Yann Sommer":          "https://commons.wikimedia.org/wiki/Special:FilePath/Yann_Sommer_2022.jpg",
+  // USA
+  "Weston McKennie":      "https://commons.wikimedia.org/wiki/Special:FilePath/Weston_McKennie_2022.jpg",
+  "Tyler Adams":          "https://commons.wikimedia.org/wiki/Special:FilePath/Tyler_Adams_2022.jpg",
+  // Others
+  "Marcus Rashford":      "https://commons.wikimedia.org/wiki/Special:FilePath/Marcus_Rashford_2022.jpg",
+  "Jordan Pickford":      "https://commons.wikimedia.org/wiki/Special:FilePath/Jordan_Pickford_2022.jpg",
+  "Thibaut Courtois":     "https://commons.wikimedia.org/wiki/Special:FilePath/Thibaut_Courtois_2022.jpg",
+  "Achraf Hakimi":        "https://commons.wikimedia.org/wiki/Special:FilePath/Achraf_Hakimi_2022.jpg",
+  "Luis Díaz":            "https://commons.wikimedia.org/wiki/Special:FilePath/Luis_Díaz_2022.jpg",
+  "João Palhinha":        "https://commons.wikimedia.org/wiki/Special:FilePath/João_Palhinha_2022.jpg",
 };
 
 function getPlayerPhoto(name) {
