@@ -403,7 +403,7 @@ function renderEaCard(p) {
         <div class="ea-nation">${p.nation}</div>
         ${wct ? `<div class="ea-wcteam">${wct.flag}</div>` : ''}
       </div>
-      <div class="ea-silhouette">${posIcon}</div>
+      <div class="ea-silhouette"><img class="ea-photo" src="${(()=>{ const ph=getPlayerPhoto(p.name); return ph.src; })()}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=1e1e30&color=e5e5e5&size=80&bold=true&format=svg'" alt="${p.name}" /></div>
       <div class="ea-name">${p.name.toUpperCase().split(" ").pop()}</div>
       <div class="ea-fullname">${p.name}</div>
       <div class="ea-club">${lm.nation} ${p.club}</div>
