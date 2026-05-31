@@ -610,3 +610,38 @@ function flagImg(teamId, size=32) {
   if (!code) return `<span class="flag-emoji">${emoji}</span>`;
   return `<img class="flag-img" src="https://flagcdn.com/w${size}/${code}.png" alt="${teamId}" width="${size}" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='inline'" /><span class="flag-emoji" style="display:none">${emoji}</span>`;
 }
+
+// ---- Player photo URLs (Wikipedia Commons) ----
+const PLAYER_PHOTOS = {
+  "Kylian Mbappé":      "https://commons.wikimedia.org/wiki/Special:FilePath/Kylian_Mbappe_2019.jpg",
+  "Lionel Messi":       "https://commons.wikimedia.org/wiki/Special:FilePath/Leo_Messi_v_Nigeria_2018.jpg",
+  "Cristiano Ronaldo":  "https://commons.wikimedia.org/wiki/Special:FilePath/Cristiano_Ronaldo_2018.jpg",
+  "Harry Kane":         "https://commons.wikimedia.org/wiki/Special:FilePath/Harry_Kane_2021_%28cropped%29.jpg",
+  "Erling Haaland":     "https://commons.wikimedia.org/wiki/Special:FilePath/Erling_Haaland_2022.jpg",
+  "Jude Bellingham":    "https://commons.wikimedia.org/wiki/Special:FilePath/Jude_Bellingham_2023.jpg",
+  "Bukayo Saka":        "https://commons.wikimedia.org/wiki/Special:FilePath/Bukayo_Saka_2022.jpg",
+  "Mohamed Salah":      "https://commons.wikimedia.org/wiki/Special:FilePath/Mohamed_Salah_2022.jpg",
+  "Lamine Yamal":       "https://commons.wikimedia.org/wiki/Special:FilePath/Lamine_Yamal_2024.jpg",
+  "Vinicius Junior":    "https://commons.wikimedia.org/wiki/Special:FilePath/Vinicius_Junior_2023.jpg",
+  "Robert Lewandowski": "https://commons.wikimedia.org/wiki/Special:FilePath/Robert_Lewandowski_2022.jpg",
+  "Pedri":              "https://commons.wikimedia.org/wiki/Special:FilePath/Pedri_2022.jpg",
+  "Gavi":               "https://commons.wikimedia.org/wiki/Special:FilePath/Gavi_2022.jpg",
+  "Rodri":              "https://commons.wikimedia.org/wiki/Special:FilePath/Rodri_2022.jpg",
+  "Martin Ødegaard":    "https://commons.wikimedia.org/wiki/Special:FilePath/Martin_%C3%98degaard_2023.jpg",
+  "Virgil van Dijk":    "https://commons.wikimedia.org/wiki/Special:FilePath/Virgil_van_Dijk_2019.jpg",
+  "Bruno Fernandes":    "https://commons.wikimedia.org/wiki/Special:FilePath/Bruno_Fernandes_2021.jpg",
+  "Christian Pulisic":  "https://commons.wikimedia.org/wiki/Special:FilePath/Christian_Pulisic_2023.jpg",
+  "Heung-min Son":      "https://commons.wikimedia.org/wiki/Special:FilePath/Son_Heung-min_2022.jpg",
+  "Antoine Griezmann":  "https://commons.wikimedia.org/wiki/Special:FilePath/Antoine_Griezmann_2022.jpg",
+  "Declan Rice":        "https://commons.wikimedia.org/wiki/Special:FilePath/Declan_Rice_2022.jpg",
+  "Alejandro Garnacho": "https://commons.wikimedia.org/wiki/Special:FilePath/Alejandro_Garnacho_2023.jpg",
+  "Bruno Guimarães":    "https://commons.wikimedia.org/wiki/Special:FilePath/Bruno_Guimaraes_2023.jpg",
+  "Gabriel Martinelli": "https://commons.wikimedia.org/wiki/Special:FilePath/Gabriel_Martinelli_2023.jpg",
+  "Ollie Watkins":      "https://commons.wikimedia.org/wiki/Special:FilePath/Ollie_Watkins_2023.jpg",
+};
+
+function getPlayerPhoto(name) {
+  const encoded = encodeURIComponent(name);
+  const fallback = "https://ui-avatars.com/api/?name=" + encoded + "&background=1e1e30&color=e5e5e5&size=80&bold=true&format=svg";
+  return { src: PLAYER_PHOTOS[name] || fallback, fallback };
+}

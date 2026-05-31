@@ -9,6 +9,12 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/animations.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+/* Hero slideshow */
+.hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 2s ease;z-index:0;filter:brightness(0.28) saturate(1.3)}
+.hero-slide.active{opacity:1}
+.hero-content,.hero-countdown{position:relative;z-index:2}
+</style>
 </head>
 <body>
 
@@ -18,7 +24,7 @@
      Hero
      ====================================================== -->
 <section id="hero">
-  <div class="hero-bg"></div>
+  <div id="hero-slides" aria-hidden="true"></div>
   <div class="hero-grid"></div>
 
   <!-- Floating soccer ball particles -->
@@ -32,7 +38,7 @@
     <h1 class="hero-title">
       <span class="we-are">We Are</span>
       <span class="wc-26">26</span>
-      <span class="wc-year">🇺🇸 🇨🇦 🇲🇽 &nbsp;2026</span>
+      <span class="wc-year">🇺🇸 🇨🇦 🇲🇽 &nbsp;·&nbsp; FIFA World Cup 2026</span>
     </h1>
     <p class="hero-subtitle">
       48 nations. 104 matches. Live stats, in-play probability,
@@ -222,6 +228,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   buildNav("home");
   buildFooter("footer");
+  initHeroSlideshow();
   initHeroCountdown();
   initHeroParticles();
   initFavsPreview();
@@ -324,6 +331,29 @@ function initScrollAnimations() {
     if (e.isIntersecting) { e.target.classList.add("visible", "card-visible"); }
   }), { threshold: 0.06 });
   document.querySelectorAll(".section-fade, .card-enter").forEach(el => obs.observe(el));
+}
+
+function initHeroSlideshow() {
+  var slides_container = document.getElementById("hero-slides");
+  if (!slides_container) return;
+  var images = [
+    "https://images.unsplash.com/photo-1508098682722-e99c643e8041?w=1920&q=80",
+    "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80",
+    "https://images.unsplash.com/photo-1459865264687-595d652de67e?w=1920&q=80",
+    "https://images.unsplash.com/photo-1551958219-acbc595d9e44?w=1920&q=80",
+    "https://images.unsplash.com/photo-1518604274543-a5da4a84ce6d?w=1920&q=80",
+  ];
+  slides_container.innerHTML = images.map(function(url) {
+    return '<div class="hero-slide" style="background-image:url(\'' + url + '\')"></div>';
+  }).join("");
+  var slides = slides_container.querySelectorAll(".hero-slide");
+  var current = 0;
+  slides[0].classList.add("active");
+  setInterval(function() {
+    slides[current].classList.remove("active");
+    current = (current + 1) % slides.length;
+    slides[current].classList.add("active");
+  }, 5000);
 }
 </script>
 </body>
