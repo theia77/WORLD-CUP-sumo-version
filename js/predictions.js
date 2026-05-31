@@ -163,12 +163,11 @@ const Predictions = (() => {
     const candidates = (squad.players || []).map(sp => {
       const tp = tracked.get(sp.name.toLowerCase());
       const lm = LEAGUE_META[sp.league] || LEAGUE_META["Other"];
-      if (announced && !tp) return null;
       const rating = tp?.rating || 6.2;
       const score = rating * (lm.weight || 0.5) + ((tp?.goals||0)*0.03 + (tp?.assists||0)*0.02);
       return { ...sp, rating, selectScore: score, goals: tp?.goals||0, assists: tp?.assists||0 };
     });
-    const pick = (pos, n) => candidates.filter(c=>c.pos===pos).sort((a,b)=>b.selectScore-a.selectScore).slice(0,n);
+    const pick = (pos, n) => candidates.filter(c=>c && c.pos===pos).sort((a,b)=>b.selectScore-a.selectScore).slice(0,n);
     const gk = pick("GK",1);
     const df = pick("DF",4);
     const mf = pick("MF",3);

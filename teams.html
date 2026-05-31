@@ -54,6 +54,7 @@
 .pc-pos{font-size:.6rem;font-weight:700;text-transform:uppercase;opacity:.7;letter-spacing:.5px}
 .pc-name{font-size:.68rem;font-weight:600;margin-top:2px;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis}
 .pc-club{font-size:.58rem;color:var(--text-dim);margin-top:1px;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis}
+.pc-photo{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.3);margin:0 auto 3px;display:block;background:#1e1e30}
 .pc-gk .pc-card{border-color:#ffc107;box-shadow:0 0 8px rgba(255,193,7,.3)}
 .pc-df .pc-card{border-color:#42a5f5;box-shadow:0 0 8px rgba(66,165,245,.3)}
 .pc-mf .pc-card{border-color:#66bb6a;box-shadow:0 0 8px rgba(102,187,106,.3)}
@@ -376,8 +377,10 @@ function buildLineupPanel(probableXI, squad) {
     });
     pitchHTML = placed.map(function(p, i) {
       var cls = "pc pc-" + p.pos.toLowerCase();
+      var photo = (typeof getPlayerPhoto === 'function') ? getPlayerPhoto(p.name) : { src: '', fallback: '' };
       return '<div class="' + cls + '" style="left:' + p.x + '%;top:' + p.y + '%;animation-delay:' + (i*60) + 'ms">' +
         '<div class="pc-card">' +
+        '<img class="pc-photo" src="' + photo.src + '" onerror="this.src=\'' + photo.fallback + '\'" alt="' + p.name + '" />' +
         '<div class="pc-rating">' + p.rating + "</div>" +
         '<div class="pc-pos">' + p.pos + "</div>" +
         '<div class="pc-name">' + p.name + "</div>" +
@@ -424,6 +427,7 @@ function buildSquadPanel(players, squad, awards) {
           return '<div class="tv-player-card" style="animation-delay:' + (i*30) + 'ms">' +
             '<div class="tv-pc-pos ' + pos + '">' + pos + "</div>" +
             '<div class="tv-pc-name">' + p.name + "</div>" +
+            '<img style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.15);margin:4px 0;" src="' + (typeof getPlayerPhoto === 'function' ? getPlayerPhoto(p.name).src : '') + '" onerror="this.src=\'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.name) + '&background=1e1e30&color=e5e5e5&size=80&bold=true&format=svg\'" alt="" />' +
             '<div class="tv-pc-club">' + (lm.nation || "") + " " + p.club + "</div>" +
             statsRow + "</div>";
         }).join("") +
@@ -442,6 +446,7 @@ function buildSquadPanel(players, squad, awards) {
           return '<div class="tv-player-card" style="animation-delay:' + (i*30) + 'ms">' +
             '<div class="tv-pc-pos ' + pos + '">' + pos + "</div>" +
             '<div class="tv-pc-name">' + p.name + "</div>" +
+            '<img style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.15);margin:4px 0;" src="' + (typeof getPlayerPhoto === 'function' ? getPlayerPhoto(p.name).src : '') + '" onerror="this.src=\'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.name) + '&background=1e1e30&color=e5e5e5&size=80&bold=true&format=svg\'" alt="" />' +
             '<div class="tv-pc-club">' + (lm.nation || "") + " " + p.club + "</div>" +
             '<div style="margin-top:6px;font-size:.72rem;color:var(--text-dim)">⭐ ' + p.rating +
             (p.goals ? " · ⚽ " + p.goals + "G " + p.assists + "A" : p.cs ? " · 🧤 " + p.cs + " CS" : "") + "</div>" +
