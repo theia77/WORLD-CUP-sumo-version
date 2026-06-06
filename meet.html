@@ -116,6 +116,12 @@
             </div>
           </div>
 
+          <!-- Local screen share fills the main area when active (z-index above stream iframe) -->
+          <div id="meet-screen-wrap" class="meet-screen-wrap">
+            <video id="meet-screen-video" autoplay muted playsinline></video>
+            <div class="meet-screen-label">🖥️ You are sharing your screen</div>
+          </div>
+
           <!-- Camera tiles: full gallery when no stream / horizontal strip when stream active -->
           <div id="meet-video-grid" class="meet-video-grid">
             <div id="meet-local-vid-wrap" class="meet-peer-video meet-local hidden" data-peer="local">

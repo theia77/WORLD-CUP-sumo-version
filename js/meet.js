@@ -47,6 +47,7 @@ const MeetSystem = (() => {
   let sbCh = null;
   let localStream = null;
   let screenStream = null;
+  let screenSharingPeer = null; // peerId of whoever is currently sharing their screen
   let peers = {};
   let peerMeta = {}; // peerId → { nickname, flag, handRaised, micOn, camOn }
   let audioCtx = null;
@@ -161,6 +162,23 @@ const MeetSystem = (() => {
       .on("broadcast", { event: "rtc_answer"  }, ({ payload }) => { if (payload.to === st.peerId) handleAnswer(payload); })
       .on("broadcast", { event: "rtc_ice"     }, ({ payload }) => { if (payload.to === st.peerId) handleIce(payload); })
       .on("broadcast", { event: "hand_raise"  }, ({ payload }) => handleHandRaise(payload))
+      .on("broadcast", { event: "screen_share" }, ({ payload }) => {
+        if (payload.p === st.peerId) return;
+        if (payload.sharing) {
+          screenSharingPeer = payload.p;
+          const name = peerMeta[payload.p]?.nickname || "Someone";
+          sysMsg(`🖥️ ${name} started sharing their screen`);
+          showToast(`🖥️ ${name} is sharing their screen`, "info");
+          showRemoteScreen(payload.p);
+        } else {
+          if (screenSharingPeer === payload.p) {
+            screenSharingPeer = null;
+            const name = peerMeta[payload.p]?.nickname || "Someone";
+            sysMsg(`🖥️ ${name} stopped sharing their screen`);
+            hideRemoteScreen();
+          }
+        }
+      })
       .on("broadcast", { event: "peer_meta"   }, ({ payload }) => {
         if (payload.p !== st.peerId) {
           peerMeta[payload.p] = {
@@ -393,6 +411,39 @@ const MeetSystem = (() => {
     document.addEventListener("mouseup", () => { dragging = false; pipTile.style.cursor = "move"; });
   }
 
+  // ── Remote screen share helpers ────────────────────────
+  function showRemoteScreen(peerId) {
+    const wrap = document.getElementById(`peer-${peerId}`);
+    const vid  = wrap?.querySelector("video");
+    const sw   = document.getElementById("meet-screen-wrap");
+    const sv   = document.getElementById("meet-screen-video");
+    if (!sw || !sv) return;
+    if (vid?.srcObject) {
+      sv.srcObject = vid.srcObject;
+    }
+    sw.classList.add("active");
+    const lbl = sw.querySelector(".meet-screen-label");
+    if (lbl) lbl.textContent = `🖥️ ${peerMeta[peerId]?.nickname || "Peer"} is sharing their screen`;
+    document.getElementById("meet-left-col")?.classList.add("has-stream");
+    const ph = document.getElementById("meet-stream-placeholder");
+    if (ph) ph.style.display = "none";
+  }
+
+  function hideRemoteScreen() {
+    const sw = document.getElementById("meet-screen-wrap");
+    if (sw) sw.classList.remove("active");
+    const sv = document.getElementById("meet-screen-video");
+    if (sv) sv.srcObject = null;
+    const lbl = sw?.querySelector(".meet-screen-label");
+    if (lbl) lbl.textContent = "🖥️ You are sharing your screen";
+    const hasUrlStream = document.getElementById("meet-stream-frame-wrap")?.classList.contains("active");
+    if (!hasUrlStream && !st.screenOn) {
+      document.getElementById("meet-left-col")?.classList.remove("has-stream");
+      const ph = document.getElementById("meet-stream-placeholder");
+      if (ph) ph.style.display = "";
+    }
+  }
+
   // ── WebRTC ─────────────────────────────────────────────
   async function toggleScreenShare() {
     if (st.screenOn) {
@@ -404,38 +455,59 @@ const MeetSystem = (() => {
         const sender = p.pc.getSenders().find(s => s.track?.kind === "video");
         if (sender) sender.replaceTrack(camTrack || null).catch(() => {});
       });
-      document.getElementById("meet-screen-share-vid-wrap")?.remove();
+      // Broadcast stop to other peers
+      sbCh?.send({ type:"broadcast", event:"screen_share", payload:{ p: st.peerId, sharing: false } });
+      // Hide screen from local main area
+      const sw = document.getElementById("meet-screen-wrap");
+      if (sw) sw.classList.remove("active");
+      const sv = document.getElementById("meet-screen-video");
+      if (sv) sv.srcObject = null;
+      // Restore gallery-only view if no URL stream is active
+      const hasUrlStream = document.getElementById("meet-stream-frame-wrap")?.classList.contains("active");
+      if (!hasUrlStream) {
+        document.getElementById("meet-left-col")?.classList.remove("has-stream");
+        const ph = document.getElementById("meet-stream-placeholder");
+        if (ph) ph.style.display = "";
+      }
       updateBtns();
       return;
     }
     try {
-      screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+      // Request screen + system audio
+      screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
       st.screenOn = true;
-      const screenTrack = screenStream.getVideoTracks()[0];
+      const screenTrack     = screenStream.getVideoTracks()[0];
+      const screenAudioTrack = screenStream.getAudioTracks()[0];
+
       Object.values(peers).forEach(p => {
-        const sender = p.pc.getSenders().find(s => s.track?.kind === "video");
-        if (sender) sender.replaceTrack(screenTrack).catch(() => {});
+        // Replace the outgoing video track with the screen track
+        const videoSender = p.pc.getSenders().find(s => s.track?.kind === "video");
+        if (videoSender) videoSender.replaceTrack(screenTrack).catch(() => {});
         else p.pc.addTrack(screenTrack, screenStream);
-      });
-      const grid = document.getElementById("meet-video-grid");
-      if (grid) {
-        let wrap = document.getElementById("meet-screen-share-vid-wrap");
-        if (!wrap) {
-          wrap = document.createElement("div");
-          wrap.id = "meet-screen-share-vid-wrap";
-          wrap.className = "meet-peer-video meet-local meet-screen-tile";
-          const vid = document.createElement("video");
-          vid.autoplay = true; vid.muted = true; vid.playsInline = true;
-          const lbl = document.createElement("div");
-          lbl.className = "meet-vid-label"; lbl.textContent = "🖥️ Your Screen";
-          wrap.appendChild(vid); wrap.appendChild(lbl);
-          grid.appendChild(wrap);
+        // Forward screen audio as an additional track (system audio)
+        if (screenAudioTrack) {
+          try { p.pc.addTrack(screenAudioTrack, screenStream); } catch {}
         }
-        wrap.querySelector("video").srcObject = screenStream;
+      });
+
+      // Show screen in the local main area
+      const sw = document.getElementById("meet-screen-wrap");
+      const sv = document.getElementById("meet-screen-video");
+      if (sw && sv) {
+        sv.srcObject = screenStream;
+        sw.classList.add("active");
       }
+      // Cameras collapse to bottom strip
+      document.getElementById("meet-left-col")?.classList.add("has-stream");
+      const ph = document.getElementById("meet-stream-placeholder");
+      if (ph) ph.style.display = "none";
+
+      // Broadcast to all peers so they see it in their main area too
+      sbCh?.send({ type:"broadcast", event:"screen_share", payload:{ p: st.peerId, n: st.nickname, sharing: true } });
+
       screenTrack.onended = () => { if (st.screenOn) toggleScreenShare(); };
       sysMsg("📺 You started sharing your screen");
-      showToast("Screen sharing started", "info");
+      showToast("Screen sharing started — everyone can see your screen", "success");
       updateBtns();
     } catch { alert2("Screen sharing cancelled or not supported."); }
   }
@@ -824,6 +896,8 @@ const MeetSystem = (() => {
     setAvatar(`peer-${peerId}`, meta.nickname || "Peer");
     showAvatar(`peer-${peerId}`, !hasVideo);
     updatePeerLabel(peerId);
+    // If this peer is sharing their screen, mirror their stream to the main area
+    if (peerId === screenSharingPeer) showRemoteScreen(peerId);
   }
 
   function askPeerMeta() {
@@ -1025,6 +1099,7 @@ const MeetSystem = (() => {
     prevPresenceIds = new Set();
     speakerVolumes = {};
     pinnedTileId = null;
+    screenSharingPeer = null;
     st.screenOn = false; st.handRaised = false; st.viewMode = "gallery";
     st.participantsOpen = false; st.unreadCount = 0; st.blurOn = false;
     Object.values(peers).forEach(p => p.pc.close());
@@ -1039,6 +1114,10 @@ const MeetSystem = (() => {
     document.getElementById("meet-stream-fallback")?.classList.add("hidden");
     const fw = document.getElementById("meet-stream-frame-wrap");
     fw?.classList.remove("active");
+    const sw = document.getElementById("meet-screen-wrap");
+    if (sw) sw.classList.remove("active");
+    const sv = document.getElementById("meet-screen-video");
+    if (sv) sv.srcObject = null;
     document.getElementById("meet-stream-placeholder").style.display = "";
     document.getElementById("meet-left-col")?.classList.remove("has-stream");
     document.getElementById("meet-pip-tile")?.classList.remove("visible");

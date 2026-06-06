@@ -3006,6 +3006,45 @@ button { cursor: pointer; }
   display: block;
 }
 
+/* Local screen share: sits above the iframe, below pip */
+.meet-screen-wrap {
+  position: absolute;
+  inset: 0;
+  bottom: 56px;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  background: #000;
+  display: none;
+  z-index: 4;
+}
+.meet-screen-wrap.active {
+  display: flex;
+  flex-direction: column;
+  animation: streamFadeIn 0.35s ease forwards;
+}
+.meet-screen-wrap video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
+.meet-screen-label {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 /* ── Camera tiles grid (default: fills stream area) ──────── */
 .meet-video-grid {
   position: absolute;
