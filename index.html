@@ -77,6 +77,70 @@
 </section>
 
 <!-- ======================================================
+     Kick Scrollytelling — Scroll-Driven Sprite Sequence
+     ====================================================== -->
+<section id="kick-scroll-section" class="kick-runway" aria-label="Interactive kick animation — scroll to animate">
+
+  <div class="kick-sticky">
+
+    <!-- Full-bleed canvas: sprite frame is drawn here by JS -->
+    <canvas id="kick-canvas" aria-hidden="true"></canvas>
+
+    <!-- Loading spinner shown before sprite loads -->
+    <div class="kick-loading-overlay" id="kick-loader"><span>⚽</span></div>
+
+    <!-- Cinematic gradient vignette -->
+    <div class="kick-vignette" aria-hidden="true"></div>
+
+    <!-- Vertical sidebar label -->
+    <div class="kick-section-label" aria-hidden="true">The Art of the Kick</div>
+
+    <!-- Top bar: section tag + scroll hint -->
+    <header class="kick-top-bar">
+      <span class="kick-eyebrow">⚽ &nbsp;The Beautiful Game</span>
+      <span class="kick-scroll-cue" id="kick-scroll-cue">Scroll to animate &nbsp;↓</span>
+    </header>
+
+    <!-- Phase caption cards — one per frame, stacked absolutely -->
+    <div class="kick-caption-wrap" aria-live="polite">
+
+      <div class="kick-caption active" data-frame="0">
+        <span class="kick-caption-num" aria-hidden="true">01</span>
+        <h2 class="kick-caption-title">About to Kick</h2>
+        <p class="kick-caption-body">Power coiled, eyes locked on the ball. The split-second before everything changes.</p>
+      </div>
+
+      <div class="kick-caption" data-frame="1">
+        <span class="kick-caption-num" aria-hidden="true">02</span>
+        <h2 class="kick-caption-title">Contact</h2>
+        <p class="kick-caption-body">Explosive release — foot meets ball with maximum force and laser precision.</p>
+      </div>
+
+      <div class="kick-caption" data-frame="2">
+        <span class="kick-caption-num" aria-hidden="true">03</span>
+        <h2 class="kick-caption-title">Ball in Flight</h2>
+        <p class="kick-caption-body">Airborne. 104 matches. 48 nations. History is in the making.</p>
+      </div>
+
+    </div>
+
+    <!-- Pill-style progress dots -->
+    <div class="kick-dots" aria-hidden="true">
+      <div class="kick-dot active" data-dot="0"></div>
+      <div class="kick-dot" data-dot="1"></div>
+      <div class="kick-dot" data-dot="2"></div>
+    </div>
+
+    <!-- Hairline progress bar -->
+    <div class="kick-progress-track" aria-hidden="true">
+      <div class="kick-progress-fill" id="kick-progress-fill"></div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ======================================================
      Host Cities
      ====================================================== -->
 <section class="section section-fade" id="host-cities">
@@ -232,6 +296,128 @@
 <script src="js/predictions.js"></script>
 <script src="js/api.js"></script>
 <script src="js/shared.js"></script>
+
+<!-- Kick Scrollytelling: ESM module — uses Motion One scroll() for scroll-scrubbing -->
+<script type="module">
+import { scroll } from "https://cdn.jsdelivr.net/npm/motion@latest/+esm";
+
+(function kickScrollytelling() {
+  const runway  = document.getElementById("kick-scroll-section");
+  const canvas  = document.getElementById("kick-canvas");
+  const loader  = document.getElementById("kick-loader");
+  if (!runway || !canvas) return;
+
+  const ctx    = canvas.getContext("2d");
+  const FRAMES = 3;
+  let sprite      = null;
+  let activeFrame = 0;
+  let rafId       = null;
+
+  // ── Load sprite sheet ──────────────────────────────────────
+  const img = new Image();
+  img.src = "img/kick-sprite.jpg";
+
+  img.onload = () => {
+    sprite = img;
+    if (loader) loader.style.display = "none";
+    resize();
+    drawFrame(0);
+  };
+
+  img.onerror = () => {
+    // Hide section gracefully if the asset isn't placed yet
+    if (loader) loader.innerHTML = '<span style="font-size:1rem;color:#555;font-family:var(--font-body)">Place img/kick-sprite.jpg to enable this section</span>';
+    console.warn("[KickScroll] img/kick-sprite.jpg not found.");
+  };
+
+  // ── Canvas sizing — match physical pixels for crisp rendering ──
+  function resize() {
+    const dpr  = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = rect.width  * dpr;
+    canvas.height = rect.height * dpr;
+    if (sprite) drawFrame(activeFrame);
+  }
+
+  // ── Draw one frame (0-based) from the horizontal sprite sheet ──
+  // Uses cover-fit so the panel always fills the canvas edge-to-edge.
+  function drawFrame(frame) {
+    if (!sprite || !ctx) return;
+    activeFrame = frame;
+
+    const frameW = sprite.naturalWidth  / FRAMES;
+    const frameH = sprite.naturalHeight;
+    const srcX   = frame * frameW;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Scale to cover: pick the axis that fills first, crop the other
+    const scaleX = canvas.width  / frameW;
+    const scaleY = canvas.height / frameH;
+    const scale  = Math.max(scaleX, scaleY);
+    const dw = frameW * scale;
+    const dh = frameH * scale;
+    const dx = (canvas.width  - dw) / 2;
+    const dy = (canvas.height - dh) / 2;
+
+    ctx.drawImage(sprite, srcX, 0, frameW, frameH, dx, dy, dw, dh);
+  }
+
+  // ── UI sync ────────────────────────────────────────────────
+  function updateUI(frame, progress) {
+    // Caption cards: fade the active one in
+    document.querySelectorAll(".kick-caption").forEach(el => {
+      el.classList.toggle("active", +el.dataset.frame === frame);
+    });
+
+    // Pill dots: expand the active one
+    document.querySelectorAll(".kick-dot").forEach(el => {
+      el.classList.toggle("active", +el.dataset.dot === frame);
+    });
+
+    // Hairline progress bar
+    const fill = document.getElementById("kick-progress-fill");
+    if (fill) fill.style.width = (progress * 100) + "%";
+
+    // Scroll-cue hint: fade out once user has started scrolling
+    const cue = document.getElementById("kick-scroll-cue");
+    if (cue) cue.style.opacity = progress < 0.04 ? "" : "0";
+  }
+
+  // ── Wire up Motion One's scroll() for scroll-scrubbing ─────
+  // offset: ["start start", "end end"] means:
+  //   progress = 0  when top of runway aligns with top of viewport
+  //   progress = 1  when bottom of runway aligns with bottom of viewport
+  scroll(
+    ({ y }) => {
+      const p = Math.max(0, Math.min(1, y.progress));
+
+      // Map 0→1 to frame index 0→2.
+      // Adding a tiny forward bias (0.08) makes frame transitions feel snappier.
+      const rawIndex = p * (FRAMES - 1);
+      const frame    = Math.min(FRAMES - 1, Math.floor(rawIndex + 0.08));
+
+      // Batch draw + UI update into one rAF so we never block the scroll thread
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (sprite) drawFrame(frame);
+        updateUI(frame, p);
+      });
+    },
+    {
+      target: runway,
+      offset: ["start start", "end end"],
+    }
+  );
+
+  // ── Resize handler ─────────────────────────────────────────
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 120);
+  });
+})();
+</script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   buildNav("home");
