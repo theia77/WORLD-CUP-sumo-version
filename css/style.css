@@ -5277,3 +5277,238 @@ textarea:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   Kick Scrollytelling — Scroll-Driven Sprite Sheet Animation
+   ============================================================ */
+
+/* 300 vh runway: gives the sticky scene a long scroll travel */
+.kick-runway {
+  position: relative;
+  height: 300vh;
+  background: #000;
+  isolation: isolate;
+}
+
+/* The visible sticky scene — pinned to viewport while runway scrolls */
+.kick-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Canvas fills the entire scene; JS sets internal resolution */
+#kick-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Cinematic gradient: readability vignette over any image */
+.kick-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top,  rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.25) 48%, transparent 72%),
+    linear-gradient(to right, rgba(0,0,0,0.60) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Top bar: eyebrow label + scroll cue */
+.kick-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 48px;
+  z-index: 3;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%);
+}
+
+.kick-eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Pulsing scroll hint — fades out once user scrolls */
+.kick-scroll-cue {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  transition: opacity 0.7s ease;
+  animation: kickCuePulse 2.2s ease-in-out infinite;
+}
+@keyframes kickCuePulse {
+  0%, 100% { opacity: 0.45; }
+  50%       { opacity: 0.95; }
+}
+
+/* Caption card stack — only .active is visible */
+.kick-caption-wrap {
+  position: absolute;
+  bottom: 90px;
+  left: 48px;
+  width: min(540px, calc(100vw - 64px));
+  z-index: 3;
+  /* height set by tallest card — use min-height so cards don't reflow */
+  min-height: 160px;
+}
+
+.kick-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity  0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+}
+
+.kick-caption.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Ghost frame number behind title */
+.kick-caption-num {
+  display: block;
+  font-family: var(--font-hero);
+  font-size: clamp(4rem, 8vw, 6.5rem);
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.12;
+  letter-spacing: -3px;
+  margin-bottom: -22px;
+  user-select: none;
+}
+
+.kick-caption-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.05;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.85);
+}
+
+.kick-caption-body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: rgba(255,255,255,0.68);
+  margin-top: 10px;
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+/* Pill progress dots bottom-right */
+.kick-dots {
+  position: absolute;
+  bottom: 44px;
+  right: 48px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 3;
+}
+
+.kick-dot {
+  height: 8px;
+  width: 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.22);
+  border: none;
+  padding: 0;
+  cursor: default;
+  transition:
+    background 0.35s ease,
+    width     0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.35s ease;
+}
+
+.kick-dot.active {
+  background: var(--accent);
+  width: 26px;
+  transform: none;
+}
+
+/* Hairline progress bar at the very bottom */
+.kick-progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  z-index: 3;
+}
+
+.kick-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, var(--accent), #ff6b35);
+  transition: width 0.08s linear;
+}
+
+/* Sprite-loading spinner shown before image loads */
+#kick-canvas[data-loading]::before {
+  content: "";
+}
+.kick-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  background: #050505;
+}
+.kick-loading-overlay span {
+  font-size: 3rem;
+  animation: kickSpin 1.1s linear infinite;
+  display: block;
+}
+@keyframes kickSpin { to { transform: rotate(360deg); } }
+
+/* Section header inside the sticky area — "The Art of the Kick" */
+.kick-section-label {
+  position: absolute;
+  top: 50%;
+  right: 48px;
+  transform: translateY(-50%);
+  z-index: 3;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .kick-top-bar { padding: 20px 20px; }
+  .kick-caption-wrap { left: 20px; bottom: 72px; }
+  .kick-dots { right: 20px; bottom: 28px; }
+  .kick-caption-num { font-size: 3.5rem; margin-bottom: -14px; }
+  .kick-section-label { display: none; }
+}
