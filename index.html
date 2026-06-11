@@ -178,6 +178,84 @@
 </section>
 
 <!-- ======================================================
+     Trophy Scrollytelling — Apple-style Sticky Text Scrub
+     ====================================================== -->
+<section id="trophy-scroll-section" class="trophy-runway" aria-label="World Cup story — scroll to read">
+
+  <div class="trophy-sticky">
+
+    <!-- ╔══════════════════════════════════════════════════╗
+         ║  VISUAL ASSET ZONE                              ║
+         ║  Swap #trophy-canvas for your own sprite sheet, ║
+         ║  image sequence, or <video> element.            ║
+         ║  The placeholder draws a glowing trophy on      ║
+         ║  canvas — fully driven by scroll progress.      ║
+         ╚══════════════════════════════════════════════════╝ -->
+    <canvas id="trophy-canvas" aria-hidden="true"></canvas>
+
+    <!-- Depth vignette -->
+    <div class="trophy-overlay" aria-hidden="true"></div>
+
+    <!-- ╔══════════════════════════════════════════════════╗
+         ║  TEXT STAGE — 4 panels, all stacked absolutely  ║
+         ║  JS scrubs opacity + translateY in real-time    ║
+         ╚══════════════════════════════════════════════════╝ -->
+    <div class="trophy-text-stage" aria-live="polite">
+
+      <!-- Block 0 — scroll 0%–25% -->
+      <div class="trophy-text-block" data-block="0">
+        <span class="trophy-kicker">FIFA World Cup 2026</span>
+        <h2 class="trophy-headline"><em>48</em> Nations.<br>One Trophy.</h2>
+        <p class="trophy-sub">The biggest World Cup in history — three nations, sixteen venues, one immortal dream.</p>
+      </div>
+
+      <!-- Block 1 — scroll 25%–50% -->
+      <div class="trophy-text-block" data-block="1">
+        <span class="trophy-kicker">The Journey</span>
+        <h2 class="trophy-headline"><em>104</em> Matches.<br>One Continent.</h2>
+        <p class="trophy-sub">From Vancouver to Mexico City — North America becomes the greatest stage football has ever seen.</p>
+      </div>
+
+      <!-- Block 2 — scroll 50%–75% -->
+      <div class="trophy-text-block" data-block="2">
+        <span class="trophy-kicker">The Drama</span>
+        <h2 class="trophy-headline">History Written<br>on the Pitch.</h2>
+        <p class="trophy-sub">Every match a story. Every goal a moment. Every save a miracle that echoes through generations.</p>
+      </div>
+
+      <!-- Block 3 — scroll 75%–100% -->
+      <div class="trophy-text-block" data-block="3">
+        <span class="trophy-kicker">The Glory</span>
+        <h2 class="trophy-headline">One Nation<br>Lifts the Cup.</h2>
+        <p class="trophy-sub">July 19, 2026. MetLife Stadium. Who will write their name into legend forever?</p>
+      </div>
+
+    </div>
+
+    <!-- Right-side step indicators -->
+    <div class="trophy-indicators" aria-hidden="true">
+      <div class="trophy-ind active" data-ind="0"></div>
+      <div class="trophy-ind" data-ind="1"></div>
+      <div class="trophy-ind" data-ind="2"></div>
+      <div class="trophy-ind" data-ind="3"></div>
+    </div>
+
+    <!-- Scroll cue (fades out on first scroll) -->
+    <div class="trophy-scroll-hint" id="trophy-scroll-hint" aria-hidden="true">
+      <span>Scroll</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+    </div>
+
+    <!-- Hairline progress bar -->
+    <div class="trophy-progress-track" aria-hidden="true">
+      <div class="trophy-progress-fill" id="trophy-progress-fill"></div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ======================================================
      Quick Navigation
      ====================================================== -->
 <section class="section section-fade has-player-bg" id="quick-nav-section">
@@ -418,6 +496,193 @@ import { scroll } from "https://cdn.jsdelivr.net/npm/motion@latest/+esm";
   });
 })();
 </script>
+<!-- ============================================================
+     Trophy Scrollytelling — Apple / TinyPod-style Sticky Scrub
+     Motion One scroll() maps y.progress → opacity + translateY
+     for 4 text blocks and a canvas visual simultaneously.
+     ============================================================ -->
+<script type="module">
+import { scroll } from "https://cdn.jsdelivr.net/npm/motion@latest/+esm";
+
+(function trophyScrollytelling() {
+  const runway = document.getElementById("trophy-scroll-section");
+  if (!runway) return;
+
+  // ════════════════════════════════════════════════════════════
+  //  VISUAL ASSET — replace drawVisual() with your own logic
+  //
+  //  To use a sprite sheet:
+  //    1. Load: const img = new Image(); img.src = "img/your-sprite.jpg";
+  //    2. In drawVisual(p): const frame = Math.floor(p * (TOTAL_FRAMES-1));
+  //       const srcX = frame * FRAME_WIDTH;
+  //       ctx.drawImage(img, srcX, 0, FRAME_WIDTH, IMG_H, dx, dy, dw, dh);
+  // ════════════════════════════════════════════════════════════
+  const canvas = document.getElementById("trophy-canvas");
+  const ctx    = canvas.getContext("2d");
+  let lastP    = 0;
+
+  function drawVisual(p) {
+    const W = canvas.width, H = canvas.height;
+
+    // — Background: deep red-tinted radial gradient scrubs with progress —
+    const bg = ctx.createRadialGradient(W/2, H * 0.45, 0, W/2, H * 0.45, Math.max(W, H) * 0.7);
+    bg.addColorStop(0,   `rgba(${18 + p*35}, ${4 + p*8}, ${4}, 1)`);
+    bg.addColorStop(0.6, `rgba(6, 3, 3, 1)`);
+    bg.addColorStop(1,   `rgba(2, 2, 2, 1)`);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // — Glow halo behind trophy: expands as progress advances —
+    const glowR = H * (0.22 + p * 0.12);
+    const glow  = ctx.createRadialGradient(W/2, H * 0.46, 0, W/2, H * 0.46, glowR);
+    glow.addColorStop(0,   `rgba(232, 32, 26, ${0.07 + p * 0.10})`);
+    glow.addColorStop(0.45,`rgba(255, 80, 30, ${0.04 + p * 0.05})`);
+    glow.addColorStop(1,   `rgba(0,0,0,0)`);
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    // — Trophy: scale and brightness tied to scroll progress —
+    const size  = Math.min(W, H) * (0.20 + p * 0.06);
+    const alpha = 0.75 + p * 0.25;
+    const cx    = W / 2;
+    const cy    = H * (0.48 - p * 0.02); // subtle vertical drift upward
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.font        = `${size}px serif`;
+    ctx.textAlign   = "center";
+    ctx.textBaseline= "middle";
+    ctx.fillText("🏆", cx, cy);
+    ctx.restore();
+
+    // — Floating particles: dots drift upward, opacity ∝ progress —
+    if (p > 0.05) {
+      const seed = Math.floor(p * 100); // deterministic per progress bucket
+      ctx.save();
+      ctx.globalAlpha = p * 0.25;
+      for (let i = 0; i < 18; i++) {
+        const px = W * ((((i * 137.508 + seed * 11) % 97) / 97));
+        const py = H * ((((i * 53.13  + seed * 7)  % 89) / 89));
+        const r  = 1.5 + (i % 3) * 1.2;
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fillStyle = i % 3 === 0 ? "#e8201a" : "rgba(255,255,255,0.6)";
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  // Canvas sizing — matches physical pixels for retina sharpness
+  function resizeCanvas() {
+    const dpr  = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = rect.width  * dpr;
+    canvas.height = rect.height * dpr;
+    drawVisual(lastP);
+  }
+
+  // ════════════════════════════════════════════════════════════
+  //  TEXT BLOCK ENGINE
+  //
+  //  Each block owns 1/4 of the total scroll range.
+  //  Within that window:
+  //    0–20%  → fade-in  : opacity 0→1, translateY 52px→0
+  //   20–80%  → hold     : opacity 1,   translateY 0
+  //   80–100% → fade-out : opacity 1→0, translateY 0→-32px
+  //
+  //  All values are computed inline from raw scroll progress —
+  //  no timeouts, no IntersectionObserver, pure math.
+  // ════════════════════════════════════════════════════════════
+  const blocks     = document.querySelectorAll(".trophy-text-block");
+  const indicators = document.querySelectorAll(".trophy-ind");
+  const N          = blocks.length; // 4
+
+  const FADE_IN_END  = 0.20; // first 20% of each window  = fade in
+  const FADE_OUT_START = 0.80; // last  20% of each window = fade out
+
+  // Smooth cubic ease — makes the edges of each transition feel organic
+  function ease(t) {
+    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  }
+
+  function blockState(blockIndex, p) {
+    const winStart = blockIndex / N;
+    const winEnd   = (blockIndex + 1) / N;
+    const local    = (p - winStart) / (winEnd - winStart); // 0→1 within window
+
+    if (local <= 0) return { opacity: 0, y:  52 }; // not yet
+    if (local >= 1) return { opacity: 0, y: -32 }; // already past
+
+    if (local < FADE_IN_END) {
+      const t = ease(local / FADE_IN_END);
+      return { opacity: t, y: 52 * (1 - t) };
+    }
+    if (local > FADE_OUT_START) {
+      const t = ease((local - FADE_OUT_START) / (1 - FADE_OUT_START));
+      return { opacity: 1 - t, y: -32 * t };
+    }
+    return { opacity: 1, y: 0 }; // fully visible hold zone
+  }
+
+  // ════════════════════════════════════════════════════════════
+  //  SCROLL BINDING — Motion One scroll()
+  //
+  //  offset ["start start","end end"]:
+  //    p=0 when runway top  aligns with viewport top
+  //    p=1 when runway bottom aligns with viewport bottom
+  // ════════════════════════════════════════════════════════════
+  let rafId = null;
+
+  scroll(
+    ({ y }) => {
+      const p = Math.max(0, Math.min(1, y.progress));
+      lastP = p;
+
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+
+        // 1 ── Visual
+        drawVisual(p);
+
+        // 2 ── Text blocks: write opacity + translateY directly
+        blocks.forEach((block, i) => {
+          const { opacity, y: ty } = blockState(i, p);
+          block.style.opacity   = opacity;
+          block.style.transform = `translateY(${ty}px)`;
+        });
+
+        // 3 ── Step indicators: highlight the active panel
+        const active = Math.min(N - 1, Math.floor(p * N));
+        indicators.forEach((ind, i) =>
+          ind.classList.toggle("active", i === active)
+        );
+
+        // 4 ── Progress bar
+        const fill = document.getElementById("trophy-progress-fill");
+        if (fill) fill.style.width = (p * 100) + "%";
+
+        // 5 ── Scroll cue: hide after first scroll
+        const hint = document.getElementById("trophy-scroll-hint");
+        if (hint) hint.style.opacity = p < 0.03 ? "" : "0";
+      });
+    },
+    {
+      target: runway,
+      offset: ["start start", "end end"],
+    }
+  );
+
+  // Resize + initial draw
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resizeCanvas, 100);
+  });
+  resizeCanvas();
+})();
+</script>
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   buildNav("home");
